@@ -1,0 +1,16 @@
+[
+{
+  "modid": "navigator",
+  "name": "Navigator",
+  "description": "Pathfinding for Minecraft.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["qubard (cub)"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

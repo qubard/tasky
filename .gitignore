@@ -1,0 +1,17 @@
+.DS_Store
+**/*.swp
+
+run/
+autotest/
+dist/
+
+# Gradle
+build/
+.gradle/
+classes/
+*.class
+
+# IntelliJ Files
+.idea/
+*.iml
+/logs/
