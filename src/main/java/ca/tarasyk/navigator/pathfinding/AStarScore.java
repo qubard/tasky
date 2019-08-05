@@ -1,25 +1,30 @@
 package ca.tarasyk.navigator.pathfinding;
 
-public class AStarScore<T> implements IScore<T> {
+public class AStarScore implements IScore<AStarScore> {
 
-    private T fScore;
-    private T gScore;
+    private Double fScore;
+    private Double gScore;
 
-    AStarScore setGScore(T gScore) {
+    AStarScore setGScore(Double gScore) {
         this.gScore = gScore;
         return this;
     }
 
-    AStarScore setFScore(T gScore) {
+    AStarScore setFScore(Double fScore) {
         this.fScore = fScore;
         return this;
     }
 
-    public T getFScore() {
+    public Double getFScore() {
         return this.fScore;
     }
 
-    public T getGScore() {
+    public Double getGScore() {
         return this.gScore;
+    }
+
+    @Override
+    public AStarScore defaultValue() {
+        return new AStarScore().setGScore(Double.MAX_VALUE).setFScore(Double.MAX_VALUE);
     }
 }

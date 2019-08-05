@@ -5,16 +5,16 @@ import ca.tarasyk.navigator.pathfinding.path.IPathable;
 
 import java.util.Optional;
 
-public class Node<P, S> implements IPathable<P> {
+public class Node<P, S, D> implements IPathable<D> {
 
-    private Optional<Node<P,S>> parent;
-    private Optional<S> score;
+    private Optional<Node<P, S, D>> parent = Optional.ofNullable(null);
+    private Optional<S> score = Optional.ofNullable(null);
 
-    public void setParent(Node<P,S> parent) {
+    public void setParent(Node<P, S, D> parent) {
         this.parent = Optional.of(parent);
     }
 
-    public Optional<Node<P,S>> getParent() {
+    public Optional<Node<P,S, D>> getParent() {
         return this.parent;
     }
 
@@ -27,11 +27,7 @@ public class Node<P, S> implements IPathable<P> {
     }
 
     @Override
-    public Path<P> pathFrom() {
-        Node<P, S> curr = this.getParent().get();
-        while (curr != null) {
-            curr = curr.getParent().orElse(null);
-        }
+    public Path<D> pathFrom() {
         return null;
     }
 }

@@ -1,63 +1,62 @@
 package ca.tarasyk.navigator.pathfinding;
 
-import ca.tarasyk.navigator.pathfinding.path.node.BlockNode;
-import ca.tarasyk.navigator.pathfinding.path.node.BlockNodeCompare;
+import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.pathfinding.path.movement.Move;
+import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
 import ca.tarasyk.navigator.pathfinding.path.Path;
 import net.minecraft.client.multiplayer.WorldClient;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
-public class AStarPathFinder implements IPathFinder<BlockNode> {
+public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
 
-    private Optional<WorldClient> ctx;
-    private List<BlockNode> currPath;
+    private List<PathNode> currPath;
 
     public AStarPathFinder() {
         this.currPath = new ArrayList<>();
     }
-
-    public void setWorldContext(WorldClient world) {
-        this.ctx = Optional.of(world);
-    }
-
     public void resetPath() {
         this.currPath.clear();
     }
 
     @Override
-    public Optional<Path<BlockNode>> search(BlockNode src, BlockNode dest, BiFunction<BlockNode, BlockNode, Double> heuristic) {
-        Queue<BlockNode> openSet = new PriorityQueue<>(new BlockNodeCompare());
-        Set<BlockNode> closedSet = new HashSet<>();
+    public Optional<Path<BetterBlockPos>> search(PathNode src, PathNode dest, BiFunction<PathNode, PathNode, Double> heuristic) {
+        Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
+        Set<PathNode> closedSet = new HashSet<>();
 
-        src.setScore(new AStarScore().setGScore(0).setFScore(heuristic.apply(src, dest)));
+        src.setScore(new AStarScore().setGScore(0.0).setFScore(heuristic.apply(src, dest)));
         openSet.add(src);
 
         while (!openSet.isEmpty()) {
-            BlockNode curr = openSet.remove();
+            PathNode curr = openSet.remove(); // blocknode with lowest fscore
 
             // Return the path
             if (curr.equals(dest)) {
-                return Optional.of(dest.pathFrom());
+                System.out.println("Found solution");
+                return Optional.of(curr.pathFrom());
             }
 
             openSet.remove(curr);
             closedSet.add(curr);
 
-            // TODO: implement this
-            List<BlockNode> neighbors = new ArrayList<>();
+            List<PathNode> neighbors = Move.neighborsOf(curr);
 
-            for (BlockNode neighbor: neighbors){
+            for (PathNode neighbor: neighbors){
                 if (closedSet.contains(neighbor)) {
                     continue;
                 }
 
-                double neighborGScore = neighbor.getScore().orElse(AStarScore.DEFAULT).getGScore();
+                double neighborGScore = neighbor.getScore().orElse(new AStarScore().defaultValue()).getGScore();
                 double newGScore = curr.getScore().get().getGScore() + 0; // curr always defined
 
                 if (!openSet.contains(neighbor)) {
                     openSet.add(neighbor);
-                } else if (newGScore < neighborGScore) {
+                }
+
+                if (newGScore < neighborGScore) {
                     neighbor.setParent(curr);
                     neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + heuristic.apply(neighbor, dest)));
                     openSet.add(neighbor);
@@ -65,6 +64,6 @@ public class AStarPathFinder implements IPathFinder<BlockNode> {
             }
         }
 
-        return null;
+        return Optional.ofNullable(null);
     }
 }
