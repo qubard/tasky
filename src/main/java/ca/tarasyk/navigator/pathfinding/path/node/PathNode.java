@@ -12,7 +12,7 @@ public class PathNode extends Node<PathNode, AStarScore, BetterBlockPos> {
         this(new BetterBlockPos(x, y, z));
     }
 
-    PathNode(BetterBlockPos pos) {
+    public PathNode(BetterBlockPos pos) {
         this.pos = pos;
         this.setScore((new AStarScore()).defaultValue());
     }

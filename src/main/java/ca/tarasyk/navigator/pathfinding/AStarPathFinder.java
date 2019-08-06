@@ -11,16 +11,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
-
-    private List<PathNode> currPath;
-
-    public AStarPathFinder() {
-        this.currPath = new ArrayList<>();
-    }
-    public void resetPath() {
-        this.currPath.clear();
-    }
-
     @Override
     public Optional<Path<BetterBlockPos>> search(PathNode src, PathNode dest, BiFunction<PathNode, PathNode, Double> heuristic) {
         Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
@@ -29,16 +19,14 @@ public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
         src.setScore(new AStarScore().setGScore(0.0).setFScore(heuristic.apply(src, dest)));
         openSet.add(src);
 
-        while (!openSet.isEmpty()) {
-            PathNode curr = openSet.remove(); // blocknode with lowest fscore
+        while (!openSet.isEmpty() && closedSet.size() < 50000) {
+            PathNode curr = openSet.remove();
 
             // Return the path
             if (curr.equals(dest)) {
                 dest.setParent(curr);
                 return Optional.of(dest.pathFrom());
             }
-
-            System.out.println("searching" + openSet.size());
 
             openSet.remove(curr);
             closedSet.add(curr);

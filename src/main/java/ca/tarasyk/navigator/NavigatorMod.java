@@ -16,6 +16,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -34,6 +35,9 @@ public class NavigatorMod
     private static Logger logger;
 
     private int nTicks = 0;
+
+    // this is all very temporary and dumb still
+    PathNode start = new PathNode(23, 4, -9), end = new PathNode(29, 1, -13);
 
     ArrayList<BetterBlockPos> poses = new ArrayList<>();
     Optional<Path<BetterBlockPos>> foundPath = Optional.ofNullable(null);
@@ -77,13 +81,19 @@ public class NavigatorMod
     }
 
     @SubscribeEvent
+    public void onChat(ServerChatEvent e) {
+        if (e.getMessage().equals("start")) {
+            start = new PathNode(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition()));
+        } else if (e.getMessage().equals("end")) {
+            end = new PathNode(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition()));
+            AStarPathFinder pathFinder = new AStarPathFinder();
+            foundPath = pathFinder.search(start, end, Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE);
+        }
+    }
+
+    @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent  evt)
     {
-        if (!foundPath.isPresent()) {
-            AStarPathFinder pathFinder = new AStarPathFinder();
-            foundPath = pathFinder.search(new PathNode(23, 4, -9), new PathNode(29, 1, -13), Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE);
-        }
-
         if (nTicks % 250 == 0) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             GL11.glPushMatrix();
@@ -93,9 +103,7 @@ public class NavigatorMod
             if (foundPath.isPresent()) {
                 for (BetterBlockPos pos : foundPath.get().getNodes()) {
                     renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
-                    logger.info(pos.getX() + ","  + pos.getY()+ "," + pos.getZ());
                 }
-                logger.info(foundPath.get().getNodes().size() + "");
             }
 
             GL11.glPopMatrix();
