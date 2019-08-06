@@ -5,12 +5,12 @@ public class AStarScore implements IScore<AStarScore> {
     private Double fScore;
     private Double gScore;
 
-    AStarScore setGScore(Double gScore) {
+    public AStarScore setGScore(Double gScore) {
         this.gScore = gScore;
         return this;
     }
 
-    AStarScore setFScore(Double fScore) {
+    public AStarScore setFScore(Double fScore) {
         this.fScore = fScore;
         return this;
     }

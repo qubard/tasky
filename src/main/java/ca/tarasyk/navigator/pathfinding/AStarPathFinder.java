@@ -5,11 +5,10 @@ import ca.tarasyk.navigator.pathfinding.path.movement.Move;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
 import ca.tarasyk.navigator.pathfinding.path.Path;
-import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.Minecraft;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
 
@@ -35,31 +34,37 @@ public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
 
             // Return the path
             if (curr.equals(dest)) {
-                System.out.println("Found solution");
-                return Optional.of(curr.pathFrom());
+                dest.setParent(curr);
+                return Optional.of(dest.pathFrom());
             }
+
+            System.out.println("searching" + openSet.size());
 
             openSet.remove(curr);
             closedSet.add(curr);
 
-            List<PathNode> neighbors = Move.neighborsOf(curr);
+            for (Move move : Move.moves){
+                PathNode neighbor = move.apply(curr);
 
-            for (PathNode neighbor: neighbors){
                 if (closedSet.contains(neighbor)) {
                     continue;
                 }
 
-                double neighborGScore = neighbor.getScore().orElse(new AStarScore().defaultValue()).getGScore();
-                double newGScore = curr.getScore().get().getGScore() + 0; // curr always defined
+                Optional<Double> weight = Move.calculateWeight(Minecraft.getMinecraft().world, curr, neighbor);
 
-                if (!openSet.contains(neighbor)) {
-                    openSet.add(neighbor);
-                }
+                if (weight.isPresent()) {
+                    double neighborGScore = neighbor.getScore().get().getGScore();
+                    double newGScore = curr.getScore().get().getGScore() + weight.get(); // curr always defined
 
-                if (newGScore < neighborGScore) {
-                    neighbor.setParent(curr);
-                    neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + heuristic.apply(neighbor, dest)));
-                    openSet.add(neighbor);
+                    if (!openSet.contains(neighbor)) {
+                        openSet.add(neighbor);
+                    }
+
+                    if (newGScore < neighborGScore) {
+                        neighbor.setParent(curr);
+                        neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + heuristic.apply(neighbor, dest)));
+                        openSet.add(neighbor);
+                    }
                 }
             }
         }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public class Node<P, S, D> implements IPathable<D> {
 
+    // TODO: remove P
     private Optional<Node<P, S, D>> parent = Optional.ofNullable(null);
     private Optional<S> score = Optional.ofNullable(null);
 

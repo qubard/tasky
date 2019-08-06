@@ -4,6 +4,7 @@ import ca.tarasyk.navigator.pathfinding.AStarPathFinder;
 import ca.tarasyk.navigator.pathfinding.Heuristic;
 import ca.tarasyk.navigator.pathfinding.IPathFinder;
 import ca.tarasyk.navigator.pathfinding.path.Path;
+import ca.tarasyk.navigator.pathfinding.path.movement.Move;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -72,29 +73,33 @@ public class NavigatorMod
 
     private void renderParticlesAtBlock(float x, float y, float z) {
         Random rand = new Random();
-        Minecraft.getMinecraft().world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x, y + 0.1, z  + rand.nextGaussian() * 0.015f - 0.015f/2, rand.nextGaussian() * 0.05f + - 0.05f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.05 - 0.03/2);
+        Minecraft.getMinecraft().world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x + 0.5, y + 0.5, z + 0.5, rand.nextGaussian() * 0.01f + - 0.01f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.01 - 0.01/2);
     }
 
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent  evt)
     {
+        if (!foundPath.isPresent()) {
+            AStarPathFinder pathFinder = new AStarPathFinder();
+            foundPath = pathFinder.search(new PathNode(23, 4, -9), new PathNode(29, 1, -13), Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE);
+        }
+
         if (nTicks % 250 == 0) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             GL11.glPushMatrix();
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-
             if (foundPath.isPresent()) {
                 for (BetterBlockPos pos : foundPath.get().getNodes()) {
-                    renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ() + 0.5f);
+                    renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
+                    logger.info(pos.getX() + ","  + pos.getY()+ "," + pos.getZ());
                 }
-                System.out.println("Path is present.");
+                logger.info(foundPath.get().getNodes().size() + "");
             }
 
             GL11.glPopMatrix();
         }
-        logger.info(Minecraft.getMinecraft().world.getBlockState(new BlockPos(111,66,-15)).isFullBlock());
         nTicks++;
     }
 
@@ -103,7 +108,5 @@ public class NavigatorMod
     {
         Minecraft mc = Minecraft.getMinecraft();
         MinecraftForge.EVENT_BUS.register(this);
-        IPathFinder pathFinder = new AStarPathFinder();
-        foundPath = pathFinder.search(new PathNode(0, 0, 0), new PathNode(300, 51, -20), Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE);
     }
 }
