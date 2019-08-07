@@ -7,6 +7,9 @@ public class Path<T> {
 
     private List<T> nodes = new ArrayList<T>();
 
+    /**
+     * @param node Add a node to the path
+     */
     public void addNode(T node) {
         this.nodes.add(node);
     }

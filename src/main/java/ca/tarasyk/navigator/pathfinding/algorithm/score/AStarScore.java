@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.pathfinding;
+package ca.tarasyk.navigator.pathfinding.algorithm.score;
 
 public class AStarScore implements IScore<AStarScore> {
 

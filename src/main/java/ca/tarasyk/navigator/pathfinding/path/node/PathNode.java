@@ -1,10 +1,9 @@
 package ca.tarasyk.navigator.pathfinding.path.node;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.pathfinding.AStarScore;
-import ca.tarasyk.navigator.pathfinding.path.Path;
+import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 
-public class PathNode extends Node<PathNode, AStarScore, BetterBlockPos> {
+public class PathNode extends Node<AStarScore, BetterBlockPos> {
 
     private BetterBlockPos pos;
 
@@ -27,22 +26,16 @@ public class PathNode extends Node<PathNode, AStarScore, BetterBlockPos> {
     }
 
     @Override
+    public BetterBlockPos getData() {
+        return getPos();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof PathNode)) {
             return false;
         }
 
         return ((PathNode) o).getPos().equals(this.getPos());
-    }
-
-    @Override
-    public Path<BetterBlockPos> pathFrom() {
-        PathNode curr = (PathNode) this.getParent().get();
-        Path<BetterBlockPos> path = new Path<>();
-        while (curr != null) {
-            path.addNode(curr.getPos());
-            curr = (PathNode) curr.getParent().orElse(null);
-        }
-        return path;
     }
 }

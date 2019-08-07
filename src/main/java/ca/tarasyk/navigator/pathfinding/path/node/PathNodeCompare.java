@@ -1,6 +1,6 @@
 package ca.tarasyk.navigator.pathfinding.path.node;
 
-import ca.tarasyk.navigator.pathfinding.AStarScore;
+import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 
 import java.util.Comparator;
 

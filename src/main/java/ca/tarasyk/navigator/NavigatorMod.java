@@ -1,10 +1,9 @@
 package ca.tarasyk.navigator;
 
-import ca.tarasyk.navigator.pathfinding.AStarPathFinder;
-import ca.tarasyk.navigator.pathfinding.Heuristic;
-import ca.tarasyk.navigator.pathfinding.IPathFinder;
+import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
+import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.path.Path;
-import ca.tarasyk.navigator.pathfinding.path.movement.Move;
+import ca.tarasyk.navigator.pathfinding.path.goals.SimpleGoal;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -37,42 +36,13 @@ public class NavigatorMod
     private int nTicks = 0;
 
     // this is all very temporary and dumb still
-    PathNode start = new PathNode(23, 4, -9), end = new PathNode(29, 1, -13);
-
-    ArrayList<BetterBlockPos> poses = new ArrayList<>();
+    PathNode start = new PathNode(23, 4, -9);
     Optional<Path<BetterBlockPos>> foundPath = Optional.ofNullable(null);
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
-    }
-
-    private void renderBlockAt(BlockPos pos) {
-        IBlockState state = Minecraft.getMinecraft().world.getBlockState(pos);
-
-        double renderPosX = Minecraft.getMinecraft().getRenderManager().viewerPosX;
-        double renderPosY = Minecraft.getMinecraft().getRenderManager().viewerPosY;
-        double renderPosZ = Minecraft.getMinecraft().getRenderManager().viewerPosZ;
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-renderPosX, -renderPosY, -renderPosZ);
-        //GlStateManager.disableDepth();
-
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        GlStateManager.translate(pos.getX(), pos.getY(), pos.getZ() + 1);
-        GlStateManager.color(1, 1, 1, 1);
-        brd.renderBlockBrightness(state, 1.0F);
-
-        GlStateManager.color(0F, 1F, 0F, 1F);
-        //GlStateManager.enableDepth();
-        GlStateManager.popMatrix();
-        GlStateManager.popMatrix();
     }
 
     private void renderParticlesAtBlock(float x, float y, float z) {
@@ -85,9 +55,8 @@ public class NavigatorMod
         if (e.getMessage().equals("start")) {
             start = new PathNode(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition()));
         } else if (e.getMessage().equals("end")) {
-            end = new PathNode(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition()));
-            AStarPathFinder pathFinder = new AStarPathFinder();
-            foundPath = pathFinder.search(start, end, Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE);
+            AStarPathFinder pathFinder = new AStarPathFinder(new SimpleGoal(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition())));
+            foundPath = pathFinder.search(start);
         }
     }
 
@@ -96,17 +65,12 @@ public class NavigatorMod
     {
         if (nTicks % 250 == 0) {
             EntityPlayer player = Minecraft.getMinecraft().player;
-            GL11.glPushMatrix();
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
             if (foundPath.isPresent()) {
                 for (BetterBlockPos pos : foundPath.get().getNodes()) {
                     renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
                 }
             }
-
-            GL11.glPopMatrix();
         }
         nTicks++;
     }

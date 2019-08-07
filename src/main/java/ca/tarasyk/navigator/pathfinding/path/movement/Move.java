@@ -1,7 +1,7 @@
 package ca.tarasyk.navigator.pathfinding.path.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.pathfinding.Heuristic;
+import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
@@ -39,15 +39,30 @@ public enum Move {
         this.dz = dz;
     }
 
+    /**
+     * @param prev The node we're checking against
+     * @return A new PathNode with this move applied to it
+     */
     public PathNode apply(PathNode prev) {
         BetterBlockPos pos = prev.getPos();
         return new PathNode(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
     }
 
+    /**
+     * @param ctx The in-game World
+     * @param pos The position
+     * @return Whether or not the block at `pos` is solid
+     */
     public static boolean isSolid(WorldClient ctx, BlockPos pos) {
         return ctx.getBlockState(pos).getBlock() != Blocks.AIR;
     }
 
+    /**
+     * @param ctx The in-game World
+     * @param src The source path node
+     * @param dest The destination path node
+     * @return The approximate weight of an edge from `src` to `dest`
+     */
     public static Optional<Double> calculateWeight(WorldClient ctx, PathNode src, PathNode dest) {
         boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
 
@@ -64,9 +79,13 @@ public enum Move {
         }
 
         // It simply costs the movement cost in ticks to move there
-        return Optional.of(Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE.apply(src, dest));
+        return Optional.of(Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE.apply(src.getPos(), dest.getPos()));
     }
 
+    /**
+     * @param node The node we're looking at
+     * @return The neighbors of `node`
+     */
     public static List<PathNode> neighborsOf(PathNode node) {
         ArrayList<PathNode> neighbors = new ArrayList<>();
         for (Move move : Move.moves) {
@@ -74,5 +93,4 @@ public enum Move {
         }
         return neighbors;
     }
-
 }

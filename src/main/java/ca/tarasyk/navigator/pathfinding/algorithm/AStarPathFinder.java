@@ -1,6 +1,8 @@
-package ca.tarasyk.navigator.pathfinding;
+package ca.tarasyk.navigator.pathfinding.algorithm;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
+import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.path.movement.Move;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
@@ -8,24 +10,30 @@ import ca.tarasyk.navigator.pathfinding.path.Path;
 import net.minecraft.client.Minecraft;
 
 import java.util.*;
-import java.util.function.BiFunction;
 
-public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
+public class AStarPathFinder extends PathFinder {
+
+    public AStarPathFinder(Goal goal) {
+        super(goal);
+    }
+
     @Override
-    public Optional<Path<BetterBlockPos>> search(PathNode src, PathNode dest, BiFunction<PathNode, PathNode, Double> heuristic) {
+    public Optional<Path<BetterBlockPos>> search(PathNode src) {
         Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
         Set<PathNode> closedSet = new HashSet<>();
 
-        src.setScore(new AStarScore().setGScore(0.0).setFScore(heuristic.apply(src, dest)));
+        src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src)));
         openSet.add(src);
 
-        while (!openSet.isEmpty() && closedSet.size() < 50000) {
+        while (!openSet.isEmpty()) {
             PathNode curr = openSet.remove();
 
-            // Return the path
-            if (curr.equals(dest)) {
+            // Did we meet the criteria for the goal?
+            if (goal.metGoal(curr)) {
+                System.out.println("Found goal");
+                PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
-                return Optional.of(dest.pathFrom());
+                return Optional.of(curr.pathFrom());
             }
 
             openSet.remove(curr);
@@ -50,7 +58,7 @@ public class AStarPathFinder implements IPathFinder<PathNode, BetterBlockPos> {
 
                     if (newGScore < neighborGScore) {
                         neighbor.setParent(curr);
-                        neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + heuristic.apply(neighbor, dest)));
+                        neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + goal.heuristic(neighbor)));
                         openSet.add(neighbor);
                     }
                 }
