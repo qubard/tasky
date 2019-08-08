@@ -2,7 +2,7 @@ package ca.tarasyk.navigator;
 
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
 import ca.tarasyk.navigator.pathfinding.path.Path;
-import ca.tarasyk.navigator.pathfinding.path.goals.SimpleGoal;
+import ca.tarasyk.navigator.pathfinding.path.goals.GoalXZ;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumParticleTypes;
@@ -46,7 +46,7 @@ public class NavigatorMod
         if (e.getMessage().equals("start")) {
             start = new PathNode(new BetterBlockPos(NavigatorProvider.getPlayer().getPosition()));
         } else if (e.getMessage().equals("end")) {
-            AStarPathFinder pathFinder = new AStarPathFinder(new SimpleGoal(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition())));
+            AStarPathFinder pathFinder = new AStarPathFinder(new GoalXZ(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition())));
             foundPath = pathFinder.search(start);
         }
     }

@@ -30,7 +30,6 @@ public class AStarPathFinder extends PathFinder {
 
             // Did we meet the criteria for the goal?
             if (goal.metGoal(curr.getPos())) {
-                System.out.println("Found goal");
                 PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
                 return Optional.of(curr.pathFrom());

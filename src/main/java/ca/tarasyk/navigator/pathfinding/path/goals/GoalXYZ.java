@@ -3,8 +3,8 @@ package ca.tarasyk.navigator.pathfinding.path.goals;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 
-public class SimpleGoal extends Goal {
-    public SimpleGoal(BetterBlockPos pos) {
+public class GoalXYZ extends Goal {
+    public GoalXYZ(BetterBlockPos pos) {
         super(pos);
     }
 

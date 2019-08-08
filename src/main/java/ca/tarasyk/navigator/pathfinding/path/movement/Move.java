@@ -67,24 +67,25 @@ public enum Move {
      */
     public static Optional<Double> calculateCost(WorldClient ctx, PathNode src, PathNode dest) {
         boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
-
-        if (!isSolid(ctx, dest.getPos().down())) {
-            // Nothing to stand on, or unloaded chunk, dest block is solid (can't jump on it), or we have to dig to get to the block
-            // We can add a pillar cost here
-            return Optional.ofNullable(null);
-        }
+        boolean movingXZ = dest.getPos().getX() - src.getPos().getZ() != 0 || dest.getPos().getZ() - src.getPos().getZ() != 0;
 
         double totalCost = Heuristic.REALLY_FAST_HEURISTIC.apply(src.getPos(), dest.getPos());
 
+        // Trying to climb but not pillaring straight up, increases search space complexity
+        if (!isSolid(ctx, dest.getPos().down()) && movingXZ) {
+            // Nothing to stand on, or unloaded chunk, dest block is solid (can't jump on it), or we have to dig to get to the block
+            return Optional.ofNullable(null);
+        }
+
         if (isSolid(ctx, dest.getPos())) {
-            totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos()));
+            //totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos()));
             return Optional.ofNullable(null);
         }
 
         if (NOT_CLIMBING_OR_ASCENDING) {
             // A block is blocking the way
             if (isSolid(ctx, dest.getPos().up())) {
-                totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos().up()));
+                //totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos().up()));
                 return Optional.ofNullable(null);
             }
         }
