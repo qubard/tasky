@@ -2,7 +2,6 @@ package ca.tarasyk.navigator.pathfinding.path.goals;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 
 public class SimpleGoal extends Goal {
     public SimpleGoal(BetterBlockPos pos) {
@@ -10,12 +9,12 @@ public class SimpleGoal extends Goal {
     }
 
     @Override
-    public boolean metGoal(PathNode node) {
-        return node.getPos().equals(pos);
+    public boolean metGoal(BetterBlockPos pos) {
+        return this.pos.equals(pos);
     }
 
     @Override
-    public Double heuristic(PathNode node) {
-        return Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE.apply(node.getPos(), pos);
+    public Double heuristic(BetterBlockPos pos) {
+        return Heuristic.REALLY_FAST_HEURISTIC.apply(pos, this.pos);
     }
 }

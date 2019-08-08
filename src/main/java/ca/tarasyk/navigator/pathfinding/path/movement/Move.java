@@ -1,8 +1,10 @@
 package ca.tarasyk.navigator.pathfinding.path.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -61,25 +63,35 @@ public enum Move {
      * @param ctx The in-game World
      * @param src The source path node
      * @param dest The destination path node
-     * @return The approximate weight of an edge from `src` to `dest`
+     * @return The cost of a move from `src` to `dest`
      */
-    public static Optional<Double> calculateWeight(WorldClient ctx, PathNode src, PathNode dest) {
+    public static Optional<Double> calculateCost(WorldClient ctx, PathNode src, PathNode dest) {
         boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
 
-        if (!isSolid(ctx, dest.getPos().down()) || isSolid(ctx, dest.getPos()) || isSolid(ctx, src.getPos())) {
+        if (!isSolid(ctx, dest.getPos().down())) {
             // Nothing to stand on, or unloaded chunk, dest block is solid (can't jump on it), or we have to dig to get to the block
+            // We can add a pillar cost here
+            return Optional.ofNullable(null);
+        }
+
+        double totalCost = Heuristic.REALLY_FAST_HEURISTIC.apply(src.getPos(), dest.getPos());
+
+        if (isSolid(ctx, dest.getPos())) {
+            totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos()));
             return Optional.ofNullable(null);
         }
 
         if (NOT_CLIMBING_OR_ASCENDING) {
             // A block is blocking the way
-            if (isSolid(ctx, src.getPos().up()) || isSolid(ctx, dest.getPos().up())) {
+            if (isSolid(ctx, dest.getPos().up())) {
+                totalCost += CostUtil.digCost(NavigatorProvider.getPlayer().inventory, ctx.getBlockState(dest.getPos().up()));
                 return Optional.ofNullable(null);
             }
         }
 
         // It simply costs the movement cost in ticks to move there
-        return Optional.of(Heuristic.BLOCKNODE_EUCLIDEAN_DISTANCE.apply(src.getPos(), dest.getPos()));
+        // Player moves at 0.14 blocks per tick max, but we want to estimate # of ticks
+        return Optional.of(totalCost);
     }
 
     /**

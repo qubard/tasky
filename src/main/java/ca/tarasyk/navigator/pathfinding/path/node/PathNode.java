@@ -3,6 +3,8 @@ package ca.tarasyk.navigator.pathfinding.path.node;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 
+import java.util.Optional;
+
 public class PathNode extends Node<AStarScore, BetterBlockPos> {
 
     private BetterBlockPos pos;
@@ -26,8 +28,8 @@ public class PathNode extends Node<AStarScore, BetterBlockPos> {
     }
 
     @Override
-    public BetterBlockPos getData() {
-        return getPos();
+    public Optional<BetterBlockPos> getData() {
+        return Optional.of(getPos());
     }
 
     @Override

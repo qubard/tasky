@@ -1,13 +1,13 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.path.movement.Move;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
 import ca.tarasyk.navigator.pathfinding.path.Path;
-import net.minecraft.client.Minecraft;
 
 import java.util.*;
 
@@ -22,14 +22,14 @@ public class AStarPathFinder extends PathFinder {
         Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
         Set<PathNode> closedSet = new HashSet<>();
 
-        src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src)));
+        src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src.getPos())));
         openSet.add(src);
 
         while (!openSet.isEmpty()) {
             PathNode curr = openSet.remove();
 
             // Did we meet the criteria for the goal?
-            if (goal.metGoal(curr)) {
+            if (goal.metGoal(curr.getPos())) {
                 System.out.println("Found goal");
                 PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
@@ -46,11 +46,11 @@ public class AStarPathFinder extends PathFinder {
                     continue;
                 }
 
-                Optional<Double> weight = Move.calculateWeight(Minecraft.getMinecraft().world, curr, neighbor);
+                Optional<Double> cost = Move.calculateCost(NavigatorProvider.getWorld(), curr, neighbor);
 
-                if (weight.isPresent()) {
+                if (cost.isPresent()) {
                     double neighborGScore = neighbor.getScore().get().getGScore();
-                    double newGScore = curr.getScore().get().getGScore() + weight.get(); // curr always defined
+                    double newGScore = curr.getScore().get().getGScore() + cost.get(); // curr always defined
 
                     if (!openSet.contains(neighbor)) {
                         openSet.add(neighbor);
@@ -58,7 +58,7 @@ public class AStarPathFinder extends PathFinder {
 
                     if (newGScore < neighborGScore) {
                         neighbor.setParent(curr);
-                        neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + goal.heuristic(neighbor)));
+                        neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + goal.heuristic(neighbor.getPos())));
                         openSet.add(neighbor);
                     }
                 }

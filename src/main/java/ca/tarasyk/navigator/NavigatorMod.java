@@ -1,18 +1,11 @@
 package ca.tarasyk.navigator;
 
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
-import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.path.Path;
 import ca.tarasyk.navigator.pathfinding.path.goals.SimpleGoal;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
@@ -22,9 +15,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 
@@ -47,13 +38,13 @@ public class NavigatorMod
 
     private void renderParticlesAtBlock(float x, float y, float z) {
         Random rand = new Random();
-        Minecraft.getMinecraft().world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x + 0.5, y + 0.5, z + 0.5, rand.nextGaussian() * 0.01f + - 0.01f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.01 - 0.01/2);
+        NavigatorProvider.getWorld().spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x + 0.5, y + 0.5, z + 0.5, rand.nextGaussian() * 0.01f + - 0.01f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.01 - 0.01/2);
     }
 
     @SubscribeEvent
     public void onChat(ServerChatEvent e) {
         if (e.getMessage().equals("start")) {
-            start = new PathNode(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition()));
+            start = new PathNode(new BetterBlockPos(NavigatorProvider.getPlayer().getPosition()));
         } else if (e.getMessage().equals("end")) {
             AStarPathFinder pathFinder = new AStarPathFinder(new SimpleGoal(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition())));
             foundPath = pathFinder.search(start);
@@ -64,8 +55,6 @@ public class NavigatorMod
     public void renderWorldLastEvent(RenderWorldLastEvent  evt)
     {
         if (nTicks % 250 == 0) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
-
             if (foundPath.isPresent()) {
                 for (BetterBlockPos pos : foundPath.get().getNodes()) {
                     renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
@@ -78,7 +67,6 @@ public class NavigatorMod
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        Minecraft mc = Minecraft.getMinecraft();
         MinecraftForge.EVENT_BUS.register(this);
     }
 }

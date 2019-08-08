@@ -26,7 +26,7 @@ public class Node<S, D> implements IPathable<D> {
         return this.score;
     }
 
-    public D getData() { return null; }
+    public Optional<D> getData() { return Optional.ofNullable(null); }
 
     /**
      * @return A path from the destination to the current node
@@ -36,9 +36,9 @@ public class Node<S, D> implements IPathable<D> {
         Node<S, D> curr = this.getParent().get();
         Path<D> path = new Path<>();
         while (curr != null) {
-            D data = curr.getData();
-            if (data != null) {
-                path.addNode(curr.getData());
+            Optional<D> data = curr.getData();
+            if (data.isPresent()) {
+                path.addNode(curr.getData().get());
             }
             curr = curr.getParent().orElse(null);
         }
