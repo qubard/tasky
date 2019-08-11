@@ -21,6 +21,12 @@ public class Heuristic {
         return MoveConstants.MIN_ADMISSIBLE_DISTANCE * (Math.abs(dx) + Math.abs(dz));
     };
 
+    public static BiFunction<BetterBlockPos, BetterBlockPos, Double> EUCLIDEAN_DISTANCE_2D = (src, dst) -> {
+        double dx = dst.getX() - src.getX();
+        double dz = dst.getZ() - src.getZ();
+        return Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
+    };
+
     public static BiFunction<BetterBlockPos, BetterBlockPos, Double> EUCLIDEAN_DISTANCE_3D = (src, dst) -> {
         double dx = dst.getX() - src.getX();
         double dy = dst.getY() - src.getY();

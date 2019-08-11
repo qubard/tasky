@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -123,26 +124,36 @@ public class NavigatorMod
         return readFile(path, StandardCharsets.UTF_8);
     }
 
+    ArrayList<Integer> tickList = new ArrayList<>();
+
+    private void prepopulateTickList() {
+        for (int i = 0; i < 100; i++) {
+            tickList.add((int) (Math.random() * 50) - 25);
+        }
+    }
+
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt)
     {
-        if (nTicks % 200 == 0) {
-            if (foundPath != null && foundPath.isDone()) {
-                try {
-                    Optional<BlockPosPath> potentialPath = foundPath.get();
+        if (foundPath != null && foundPath.isDone()) {
+            try {
+                Optional<BlockPosPath> potentialPath = foundPath.get();
 
-                    if (!potentialPath.isPresent()) {
-                        System.out.println("path is null?");
-                    } else {
-                        BlockPosPath a = (BlockPosPath) potentialPath.get();
-                        BetterBlockPos bb = new BetterBlockPos(NavigatorProvider.getPlayer().getPosition());
-                        for (BetterBlockPos pos : a.pathNear(50.0, bb).getNodes()) {
+                if (!potentialPath.isPresent()) {
+                    System.out.println("path is null?");
+                } else {
+                    BlockPosPath a = (BlockPosPath) potentialPath.get();
+                    BetterBlockPos bb = new BetterBlockPos(NavigatorProvider.getPlayer().getPosition());
+                    int i = 0;
+                    for (BetterBlockPos pos : a.pathNear(50.0, bb).getNodes()) {
+                        if (nTicks % (200 + tickList.get(i % tickList.size())) == 0) {
                             renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
                         }
+                        i++;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         nTicks++;
@@ -151,6 +162,7 @@ public class NavigatorMod
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+        this.prepopulateTickList();
         executorService = Executors.newFixedThreadPool(2);
         MinecraftForge.EVENT_BUS.register(this);
         /*Thread th = new Thread(new Runnable(){
