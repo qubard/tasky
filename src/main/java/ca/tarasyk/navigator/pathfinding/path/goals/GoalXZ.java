@@ -15,6 +15,6 @@ public class GoalXZ extends Goal {
 
     @Override
     public Double heuristic(BetterBlockPos pos) {
-        return Heuristic.REALLY_FAST_HEURISTIC.apply(pos, this.pos);
+        return Heuristic.REALLY_FAST_HEURISTIC_XZ.apply(pos, this.pos);
     }
 }

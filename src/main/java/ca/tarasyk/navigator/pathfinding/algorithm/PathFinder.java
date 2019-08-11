@@ -1,7 +1,6 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
-import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.pathfinding.path.Path;
+import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 
@@ -15,5 +14,5 @@ abstract class PathFinder {
         this.goal = goal;
     }
 
-    abstract Optional<Path<BetterBlockPos>> search(PathNode src);
+    abstract Optional<BlockPosPath> search(PathNode src);
 }

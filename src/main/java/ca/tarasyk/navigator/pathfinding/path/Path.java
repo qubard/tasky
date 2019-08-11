@@ -5,13 +5,17 @@ import java.util.List;
 
 public class Path<T> {
 
-    private List<T> nodes = new ArrayList<T>();
+    protected List<T> nodes = new ArrayList<T>();
 
     /**
      * @param node Add a node to the path
      */
     public void addNode(T node) {
         this.nodes.add(node);
+    }
+
+    public T getNode(int i) {
+        return this.nodes.get(this.nodes.size() - i - 1);
     }
 
     public List<T> getNodes() {

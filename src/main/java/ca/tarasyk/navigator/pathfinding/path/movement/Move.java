@@ -1,10 +1,10 @@
 package ca.tarasyk.navigator.pathfinding.path.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +56,8 @@ public enum Move {
      * @return Whether or not the block at `pos` is solid
      */
     public static boolean isSolid(WorldClient ctx, BlockPos pos) {
-        return ctx.getBlockState(pos).getBlock() != Blocks.AIR;
+        Block block = ctx.getBlockState(pos).getBlock();
+        return block != Blocks.AIR && block != Blocks.WATER && block != Blocks.LAVA && block != Blocks.FLOWING_LAVA && block != Blocks.FLOWING_WATER;
     }
 
     /**
@@ -69,7 +70,7 @@ public enum Move {
         boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
         boolean movingXZ = dest.getPos().getX() - src.getPos().getZ() != 0 || dest.getPos().getZ() - src.getPos().getZ() != 0;
 
-        double totalCost = Heuristic.REALLY_FAST_HEURISTIC.apply(src.getPos(), dest.getPos());
+        double totalCost = Heuristic.REALLY_FAST_HEURISTIC_XZ.apply(src.getPos(), dest.getPos());
 
         // Trying to climb but not pillaring straight up, increases search space complexity
         if (!isSolid(ctx, dest.getPos().down()) && movingXZ) {
