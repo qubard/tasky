@@ -57,7 +57,7 @@ public enum Move {
      */
     public static boolean isSolid(WorldClient ctx, BlockPos pos) {
         Block block = ctx.getBlockState(pos).getBlock();
-        return block != Blocks.AIR && block != Blocks.WATER && block != Blocks.LAVA && block != Blocks.FLOWING_LAVA && block != Blocks.FLOWING_WATER;
+        return !block.isPassable(ctx, pos) || (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA || block == Blocks.FLOWING_WATER);
     }
 
     /**

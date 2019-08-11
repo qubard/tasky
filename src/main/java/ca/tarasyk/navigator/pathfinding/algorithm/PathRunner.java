@@ -16,13 +16,6 @@ public class PathRunner implements Runnable {
         this.path = path;
     }
 
-    /**
-     * @return Whether or not the player is at the goal
-     */
-    public boolean isAtGoal() {
-        return NavigatorProvider.getPlayer().getDistanceSq(path.getNode(path.getNodes().size() - 1)) <= 0.5;
-    }
-
     @Override
     public void run() {
         boolean prevAutoJump = NavigatorProvider.getMinecraft().gameSettings.autoJump;
@@ -55,26 +48,14 @@ public class PathRunner implements Runnable {
                     p.rotationPitch = 40f;
                 }
 
-                NavigatorMod.printDebugMessage(currIndex + "->" + nodes.size() + "," + dx + "," + dz + "," + yaw);
-                if (targetNode.equals(path.getNode(nodes.size() - 1)) && Heuristic.EUCLIDEAN_DISTANCE_3D.apply(new BetterBlockPos(p.getPosition()), new BetterBlockPos(targetNode.getX() + 0.5, p.posY, targetNode.getZ() + 0.5)) <= 0.5) {
-                    break;
-                }
-
-                if (Math.sqrt(p.getDistanceSq(targetNode.getX() + 0.5, p.posY, targetNode.getZ() + 0.5)) < 0.2) {
+                if ((int)p.posX == (int)(targetNode.getX() + 0.5) && (int)p.posZ == (int)(targetNode.getZ() + 0.5) && (int)p.posY == targetNode.getY()) {
                     currIndex++;
-                }
-
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    NavigatorMod.printDebugMessage((int)(100 *(currIndex + 1) / nodes.size()) + "%");
                 }
             } else {
-                NavigatorMod.printDebugMessage("index exceeds?.");
                 break;
             }
         }
-        NavigatorMod.printDebugMessage("Done.");
 
         NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
         NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindJump.getKeyCode(), false);

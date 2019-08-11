@@ -9,10 +9,12 @@ import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.path.goals.GoalXZ;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -46,25 +48,26 @@ public class HookLib extends TwoArgFunction {
             int x = arg1.checkint();
             int y = arg2.checkint();
             int z = arg3.checkint();
-            BetterBlockPos playerPos = new BetterBlockPos(Minecraft.getMinecraft().player.getPosition());
+            EntityPlayer player = Minecraft.getMinecraft().player;
+            BetterBlockPos playerPos = new BetterBlockPos(player.getPosition());
             AStarPathFinder pathFinder = new AStarPathFinder(new GoalXZ(new BetterBlockPos(x, y, z)), (long) 3000);
             Future<Optional<BlockPosPath>> future = NavigatorMod.executorService.submit(() -> pathFinder.search(new PathNode(playerPos)));
             try {
                 Optional<BlockPosPath> potentialPath = future.get();
                 if (!pathFinder.hasFailed()) {
-                    Future f = NavigatorMod.executorService.submit(new PathRunner(potentialPath.get()));
-                    NavigatorMod.printDebugMessage("Started pathing");
+                    PathRunner pathRunner = new PathRunner(potentialPath.get());
+                    Future f = NavigatorMod.executorService.submit(pathRunner);
                     f.get();
-                    NavigatorMod.printDebugMessage("Ended pathing");
+                    // If the pathFinder failed it did not reach the last node
+                    return CoerceJavaToLua.coerce(!pathFinder.hasFailed());
                 } else {
                     NavigatorMod.printDebugMessage("pathfinder failed hasFailed()");
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-            return null;
+
+            return CoerceJavaToLua.coerce(false);
         }
     }
 

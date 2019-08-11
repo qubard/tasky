@@ -15,6 +15,7 @@ public class Path<T> {
     }
 
     public T getNode(int i) {
+        if (i < 0) i = 0;
         return this.nodes.get(this.nodes.size() - i - 1);
     }
 
