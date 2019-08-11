@@ -1,6 +1,5 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
-import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
@@ -8,7 +7,6 @@ import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.path.movement.Move;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
-import ca.tarasyk.navigator.pathfinding.path.Path;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 
@@ -17,17 +15,24 @@ import java.util.*;
 public class AStarPathFinder extends PathFinder {
 
     private Long timeout;
+    private boolean failed;
 
     public AStarPathFinder(Goal goal, Long timeout) {
         super(goal);
         this.timeout = timeout;
     }
 
+    public boolean hasFailed() {
+        return failed;
+    }
+
+    private void setFailed(boolean state) {
+        this.failed = state;
+    }
+
     public Optional<BlockPosPath> search(PathNode src) {
         Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
         Set<PathNode> closedSet = new HashSet<>();
-
-        int n = 0;
 
         Long start = System.currentTimeMillis();
 
@@ -35,6 +40,7 @@ public class AStarPathFinder extends PathFinder {
         openSet.add(src);
 
         PathNode curr = src;
+        setFailed(false);
 
         while (!openSet.isEmpty()) {
             curr = openSet.remove();
@@ -43,13 +49,14 @@ public class AStarPathFinder extends PathFinder {
             if (goal.metGoal(curr.getPos())) {
                 PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(n + " movements considered."));
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered."));
                 return Optional.of(new BlockPosPath(curr.pathFrom()));
             }
 
             // Return the best path so far if we timeout
             if (System.currentTimeMillis() - start > timeout) {
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(n + " movements considered, timeout"));
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered, timeout"));
+                setFailed(true);
                 return Optional.of(new BlockPosPath(curr.pathFrom()));
             }
 
@@ -62,8 +69,6 @@ public class AStarPathFinder extends PathFinder {
                 if (closedSet.contains(neighbor)) {
                     continue;
                 }
-
-                n++;
 
                 Optional<Double> cost = Move.calculateCost(NavigatorProvider.getWorld(), curr, neighbor);
 
@@ -84,7 +89,8 @@ public class AStarPathFinder extends PathFinder {
             }
         }
 
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(n + " movements considered, but no path existed"));
+        setFailed(true);
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered, but no path existed"));
         return Optional.of(new BlockPosPath(curr.pathFrom()));
     }
 }

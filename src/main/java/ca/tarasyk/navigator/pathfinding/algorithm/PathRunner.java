@@ -16,6 +16,13 @@ public class PathRunner implements Runnable {
         this.path = path;
     }
 
+    /**
+     * @return Whether or not the player is at the goal
+     */
+    public boolean isAtGoal() {
+        return NavigatorProvider.getPlayer().getDistanceSq(path.getNode(path.getNodes().size() - 1)) <= 0.5;
+    }
+
     @Override
     public void run() {
         boolean prevAutoJump = NavigatorProvider.getMinecraft().gameSettings.autoJump;
@@ -49,7 +56,7 @@ public class PathRunner implements Runnable {
                 }
 
                 NavigatorMod.printDebugMessage(currIndex + "->" + nodes.size() + "," + dx + "," + dz + "," + yaw);
-                if (targetNode.equals(path.getNode(nodes.size() - 1)) && Heuristic.EUCLIDEAN_DISTANCE_3D.apply(new BetterBlockPos(p.getPosition()), new BetterBlockPos(targetNode.getX() + 0.5, p.posY, targetNode.getZ() + 0.5)) <= 0.3) {
+                if (targetNode.equals(path.getNode(nodes.size() - 1)) && Heuristic.EUCLIDEAN_DISTANCE_3D.apply(new BetterBlockPos(p.getPosition()), new BetterBlockPos(targetNode.getX() + 0.5, p.posY, targetNode.getZ() + 0.5)) <= 0.5) {
                     break;
                 }
 

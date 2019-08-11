@@ -1,6 +1,5 @@
 package ca.tarasyk.navigator.api.lua;
 
-import ca.tarasyk.navigator.NavigatorMod;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class HookProvider {
-
     private static HookProvider singleton = new HookProvider();
     private static Map<Hook, LuaFunction> hookTable;
 

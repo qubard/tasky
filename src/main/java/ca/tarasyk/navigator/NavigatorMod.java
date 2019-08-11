@@ -51,7 +51,7 @@ public class NavigatorMod
     // this is all very temporary and dumb still
     PathNode start = new PathNode(23, 4, -9);
     Future<Optional<BlockPosPath>> foundPath;
-    ExecutorService executorService;
+    public static ExecutorService executorService;
 
     public static LuaFunction chatFuncHook = null;
 
