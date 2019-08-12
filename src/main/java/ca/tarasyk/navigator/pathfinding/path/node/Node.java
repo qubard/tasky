@@ -1,5 +1,6 @@
 package ca.tarasyk.navigator.pathfinding.path.node;
 
+import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.pathfinding.path.Path;
 import ca.tarasyk.navigator.pathfinding.path.IPathable;
 
@@ -33,7 +34,7 @@ public class Node<S, D> implements IPathable<D> {
      */
     @Override
     public Path<D> pathFrom() {
-        Node<S, D> curr = this.getParent().get();
+        Node<S, D> curr = this;
         Path<D> path = new Path<>();
         while (curr != null) {
             Optional<D> data = curr.getData();

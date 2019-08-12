@@ -10,7 +10,7 @@ public class GoalXZ extends Goal {
 
     @Override
     public boolean metGoal(BetterBlockPos pos) {
-        return this.pos.getZ() == pos.getZ() && this.pos.getX() == pos.getX();
+        return pos.getX() == this.getPos().getX() && pos.getZ() == this.getPos().getZ();
     }
 
     @Override

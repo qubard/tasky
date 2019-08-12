@@ -1,7 +1,10 @@
 package ca.tarasyk.navigator.pathfinding.path;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.NavigatorMod;
+import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.function.BiFunction;
 
@@ -17,23 +20,25 @@ public class BlockPosPath extends Path<BetterBlockPos> {
      */
     public int indexForClosest(BetterBlockPos pos, BiFunction<BetterBlockPos, BetterBlockPos, Double> heuristic) {
         int minIndex = 0;
-        double minD = Double.MAX_VALUE;
-        // we can't really do this in logn time unless we use a quadtree
         for (int i = 0; i < nodes.size(); i++) {
             BetterBlockPos node = getNode(i);
-            double d = heuristic.apply(new BetterBlockPos(node.getX() + 0.5, pos.getY(), node.getZ() + 0.5), pos);
-            if (d < minD) {
-                minIndex = i;
-                minD = d;
+            EntityPlayer p = NavigatorProvider.getPlayer();
+            double a = p.posX < 0 ? Math.ceil(p.posX) : Math.floor(p.posX);
+            double b = p.posZ < 0 ? Math.ceil(p.posZ) : Math.floor(p.posZ);
+            double c = node.getX() + 0.5 < 0 ? Math.ceil(node.getX()+ 0.5 ) : Math.floor(node.getX()+ 0.5 );
+            double d = node.getZ() + 0.5 < 0 ? Math.ceil(node.getZ()+ 0.5 ) : Math.floor(node.getZ()+ 0.5 );
+
+            if (a == c && b == d) {
+                return i;
             }
         }
         return minIndex;
     }
 
     /**
-     * @param count The number of nodes
+     * @param range The range from pos
      * @param pos The position
-     * @return The path with `n` nodes near the given position
+     * @return The path nodes near `pos` at distance `range`
      */
     public Path<BetterBlockPos> pathNear(double range, BetterBlockPos pos) {
         Path<BetterBlockPos> newPath = new Path<>();

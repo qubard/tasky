@@ -26,10 +26,22 @@ public final class BetterBlockPos extends BlockPos {
     }
 
     @Override
+    public String toString() {
+        return "<" + x + "," + y + "," + z + ">";
+    }
+
+    @Override
     public int hashCode() {
         long hash = 3241;
         hash = 3457689L * hash + x;
         hash = 8734625L * hash + y;
+        hash = 2873465L * hash + z;
+        return (int) hash;
+    }
+
+    public int hashCodeXZ() {
+        long hash = 3241;
+        hash = 3457689L * hash + x;
         hash = 2873465L * hash + z;
         return (int) hash;
     }
@@ -46,6 +58,10 @@ public final class BetterBlockPos extends BlockPos {
         }
         BlockPos oth = (BlockPos) o;
         return oth.getX() == x && oth.getY() == y && oth.getZ() == z;
+    }
+
+    public BetterBlockPos add(BetterBlockPos other) {
+        return new BetterBlockPos(x + other.getX(), y + other.getY(), z + other.getZ());
     }
 
     @Override

@@ -6,6 +6,7 @@ import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
 import ca.tarasyk.navigator.pathfinding.algorithm.PathRunner;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
+import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.path.goals.GoalXZ;
 import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
 import net.minecraft.client.Minecraft;
@@ -50,12 +51,14 @@ public class HookLib extends TwoArgFunction {
             int z = arg3.checkint();
             EntityPlayer player = Minecraft.getMinecraft().player;
             BetterBlockPos playerPos = new BetterBlockPos(player.getPosition());
-            AStarPathFinder pathFinder = new AStarPathFinder(new GoalXZ(new BetterBlockPos(x, y, z)), (long) 3000);
+            Goal goal = new GoalXZ(new BetterBlockPos(x, y, z));
+            AStarPathFinder pathFinder = new AStarPathFinder(goal, (long) 3000);
             Future<Optional<BlockPosPath>> future = NavigatorMod.executorService.submit(() -> pathFinder.search(new PathNode(playerPos)));
             try {
                 Optional<BlockPosPath> potentialPath = future.get();
                 if (!pathFinder.hasFailed()) {
-                    PathRunner pathRunner = new PathRunner(potentialPath.get());
+                    NavigatorMod.path = potentialPath.get();
+                    PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
                     Future f = NavigatorMod.executorService.submit(pathRunner);
                     f.get();
                     // If the pathFinder failed it did not reach the last node

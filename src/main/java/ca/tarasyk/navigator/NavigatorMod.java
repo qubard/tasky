@@ -94,17 +94,10 @@ public class NavigatorMod
                 String errMsg = err.toString().replace("\n", "").replace("\r", "");
                 printDebugMessage("Failed to load: " + errMsg);
             }
-        } else if (e.getMessage().equals("path")) {
-            if (foundPath != null && foundPath.isDone()) {
-                try {
-                    Optional<BlockPosPath> potentialPath = foundPath.get();
-                    executorService.submit(new PathRunner(potentialPath.get()));
-                } catch (Exception err) {
-                }
-            }
         } else {
             HookProvider.getProvider().dispatch(Hook.ON_CHAT, e);
         }
+        printDebugMessage(""+NavigatorProvider.getPlayer().posX +"," + NavigatorProvider.getPlayer().posZ);
     }
 
     public static void printDebugMessage(String msg) {
@@ -132,28 +125,19 @@ public class NavigatorMod
         }
     }
 
+    public static BlockPosPath path = null;
+
     @SubscribeEvent
     public void renderWorldLastEvent(RenderWorldLastEvent evt)
     {
-        if (foundPath != null && foundPath.isDone()) {
-            try {
-                Optional<BlockPosPath> potentialPath = foundPath.get();
-
-                if (!potentialPath.isPresent()) {
-                    System.out.println("path is null?");
-                } else {
-                    BlockPosPath a = (BlockPosPath) potentialPath.get();
-                    BetterBlockPos bb = new BetterBlockPos(NavigatorProvider.getPlayer().getPosition());
-                    int i = 0;
-                    for (BetterBlockPos pos : a.pathNear(50.0, bb).getNodes()) {
-                        if (nTicks % (200 + tickList.get(i % tickList.size())) == 0) {
-                            renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
-                        }
-                        i++;
-                    }
+        if (path != null) {
+            BetterBlockPos bb = new BetterBlockPos(NavigatorProvider.getPlayer().getPosition());
+            int i = 0;
+            for (BetterBlockPos pos : path.pathNear(50.0, bb).getNodes()) {
+                if (nTicks % (200 + tickList.get(i % tickList.size())) == 0) {
+                    renderParticlesAtBlock((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                i++;
             }
         }
         nTicks++;
@@ -163,7 +147,7 @@ public class NavigatorMod
     public void init(FMLInitializationEvent event)
     {
         this.prepopulateTickList();
-        executorService = Executors.newFixedThreadPool(2);
+        executorService = Executors.newSingleThreadExecutor();
         MinecraftForge.EVENT_BUS.register(this);
         /*Thread th = new Thread(new Runnable(){
                 @Override
