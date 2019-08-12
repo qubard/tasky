@@ -3,10 +3,10 @@ package ca.tarasyk.navigator.pathfinding.algorithm;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
-import ca.tarasyk.navigator.pathfinding.path.movement.Move;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNodeCompare;
+import ca.tarasyk.navigator.pathfinding.goals.Goal;
+import ca.tarasyk.navigator.pathfinding.movement.Move;
+import ca.tarasyk.navigator.pathfinding.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.node.PathNodeCompare;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 

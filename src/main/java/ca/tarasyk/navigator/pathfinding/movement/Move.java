@@ -1,12 +1,10 @@
-package ca.tarasyk.navigator.pathfinding.path.movement;
+package ca.tarasyk.navigator.pathfinding.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;

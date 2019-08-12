@@ -1,7 +1,7 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.pathfinding.path.movement.MoveConstants;
+import ca.tarasyk.navigator.pathfinding.movement.MoveConstants;
 
 import java.util.function.BiFunction;
 

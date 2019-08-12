@@ -4,14 +4,11 @@ import ca.tarasyk.navigator.api.lua.Hook;
 import ca.tarasyk.navigator.api.lua.HookLib;
 import ca.tarasyk.navigator.api.lua.HookProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
-import ca.tarasyk.navigator.pathfinding.algorithm.PathRunner;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.path.Path;
-import ca.tarasyk.navigator.pathfinding.path.goals.GoalXZ;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.goals.GoalXZ;
+import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -68,7 +65,7 @@ public class NavigatorMod
 
     @SubscribeEvent
     public void onChat(LivingHurtEvent e) {
-        HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e);
+        executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
     }
 
     @SubscribeEvent
@@ -81,21 +78,22 @@ public class NavigatorMod
             long start = System.currentTimeMillis();
             foundPath = future;
         } if (e.getMessage().equals("-load")) {
-            System.out.println("Destroying");
-            try {
-                HookProvider.getProvider().unhook();
-                Globals globals = JsePlatform.standardGlobals();
-                globals.load(new HookLib());
-                LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
-                chunk.call();
-                printDebugMessage("Successfully loaded test.lua!");
-            } catch (LuaError | IOException err) {
-                HookProvider.getProvider().unhook();
-                String errMsg = err.toString().replace("\n", "").replace("\r", "");
-                printDebugMessage("Failed to load: " + errMsg);
-            }
+            executorService.submit(() -> {
+                try {
+                    HookProvider.getProvider().unhook();
+                    Globals globals = JsePlatform.standardGlobals();
+                    globals.load(new HookLib());
+                    LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
+                    chunk.call();
+                    printDebugMessage("Successfully loaded test.lua!");
+                } catch (LuaError | IOException err) {
+                    HookProvider.getProvider().unhook();
+                    String errMsg = err.toString().replace("\n", "").replace("\r", "");
+                    printDebugMessage("Failed to load: " + errMsg);
+                }
+            });
         } else {
-            HookProvider.getProvider().dispatch(Hook.ON_CHAT, e);
+            executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
         }
         printDebugMessage(""+NavigatorProvider.getPlayer().posX +"," + NavigatorProvider.getPlayer().posZ);
     }
@@ -147,7 +145,7 @@ public class NavigatorMod
     public void init(FMLInitializationEvent event)
     {
         this.prepopulateTickList();
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newFixedThreadPool(4);
         MinecraftForge.EVENT_BUS.register(this);
         /*Thread th = new Thread(new Runnable(){
                 @Override

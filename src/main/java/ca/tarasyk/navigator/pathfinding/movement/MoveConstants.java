@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.pathfinding.path.movement;
+package ca.tarasyk.navigator.pathfinding.movement;
 
 public class MoveConstants {
     // D * (dx + dy + dz) where D is the lowest cost distance between nodes

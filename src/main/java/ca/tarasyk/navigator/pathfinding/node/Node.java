@@ -1,6 +1,5 @@
-package ca.tarasyk.navigator.pathfinding.path.node;
+package ca.tarasyk.navigator.pathfinding.node;
 
-import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.pathfinding.path.Path;
 import ca.tarasyk.navigator.pathfinding.path.IPathable;
 

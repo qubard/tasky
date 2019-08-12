@@ -1,8 +1,8 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
-import ca.tarasyk.navigator.pathfinding.path.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.goals.Goal;
+import ca.tarasyk.navigator.pathfinding.node.PathNode;
 
 import java.util.Optional;
 

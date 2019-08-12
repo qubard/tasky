@@ -4,10 +4,9 @@ import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.path.goals.Goal;
-import ca.tarasyk.navigator.pathfinding.path.movement.Move;
+import ca.tarasyk.navigator.pathfinding.goals.Goal;
+import ca.tarasyk.navigator.pathfinding.movement.Move;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 

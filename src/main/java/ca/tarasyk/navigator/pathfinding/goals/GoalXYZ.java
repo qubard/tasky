@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.pathfinding.path.goals;
+package ca.tarasyk.navigator.pathfinding.goals;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;

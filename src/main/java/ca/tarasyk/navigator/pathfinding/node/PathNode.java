@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.pathfinding.path.node;
+package ca.tarasyk.navigator.pathfinding.node;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
