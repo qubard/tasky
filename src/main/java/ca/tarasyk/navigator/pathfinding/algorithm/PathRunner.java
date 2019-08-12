@@ -6,6 +6,7 @@ import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.goals.Goal;
 import ca.tarasyk.navigator.pathfinding.movement.Move;
+import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.List;
@@ -18,10 +19,6 @@ public class PathRunner implements Runnable {
     public PathRunner(BlockPosPath path, Goal goal) {
         this.path = path;
         this.goal = goal;
-    }
-
-    private void jump(boolean state) {
-        NavigatorProvider.getMinecraft().gameSettings.keyBindJump.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindJump.getKeyCode(), state);
     }
 
     @Override
@@ -57,12 +54,8 @@ public class PathRunner implements Runnable {
                 if (NavigatorProvider.getPlayer().isInWater()) {
                     NavigatorProvider.getMinecraft().gameSettings.keyBindJump.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindJump.getKeyCode(), true);
                 } else {
-                    // Does the player have to jump up and are they close enough?
-                    if (targetNode.getY() - (int)p.posY >= 1) {
-                        jump(true);
-                    } else {
-                        jump(false);
-                    }
+                    // Does the player have to jump up? (the target node is a block above)
+                    PlayerUtil.jump(targetNode.getY() - (int)p.posY >= 1);
                 }
 
                 NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), true);

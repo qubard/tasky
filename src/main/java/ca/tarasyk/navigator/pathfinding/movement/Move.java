@@ -4,6 +4,7 @@ import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
+import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,22 +40,6 @@ public enum Move {
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
-    }
-
-    private static void lookAt(BetterBlockPos pos) {
-        EntityPlayer p = NavigatorProvider.getPlayer();
-
-        double dx = p.posX - (double) (pos.getX() + 0.5);
-        double dy = p.posY - (double) (pos.getY() + 0.5);
-        double dz = p.posZ - (double) (pos.getZ() + 0.5);
-        float yaw = (float) (Math.atan2(dx, dz) * 180f / Math.PI);
-        yaw = 180 - yaw;
-        p.rotationYaw = yaw;
-        if ((int) p.posY > pos.getY()) {
-            p.rotationPitch = 90f;
-        } else {
-            p.rotationPitch = 45f;
-        }
     }
 
     /**
@@ -98,7 +83,7 @@ public enum Move {
             BetterBlockPos remove = toRemove.peek();
             if (Move.isStrictlySolid(NavigatorProvider.getWorld(), remove)) {
                 NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
-                lookAt(remove);
+                PlayerUtil.lookAt(remove);
                 NavigatorProvider.getMinecraft().playerController.onPlayerDamageBlock(remove, EnumFacing.UP);
                 NavigatorProvider.getMinecraft().effectRenderer.addBlockHitEffects(remove, EnumFacing.UP);
                 NavigatorProvider.getMinecraft().player.swingArm(EnumHand.MAIN_HAND);
