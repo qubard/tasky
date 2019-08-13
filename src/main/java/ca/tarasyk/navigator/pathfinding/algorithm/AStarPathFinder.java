@@ -41,7 +41,7 @@ public class AStarPathFinder extends PathFinder {
                 PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered."));
-                return Optional.of(new BlockPosPath(curr.pathFrom()));
+                return Optional.of(new BlockPosPath(dest.pathFrom()));
             }
 
             // Return the best path so far if we timeout

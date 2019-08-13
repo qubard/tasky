@@ -27,6 +27,7 @@ public class PathRunner implements Runnable {
         EntityPlayer p = NavigatorProvider.getPlayer();
 
         int currIndex = path.nextClosest(0);
+        long elapsedMoveTime = 0; // So we don't get stuck at a node (very rare, but sort of unpreventable)
 
         while (true) {
             if (currIndex + 1 < nodes.size()) {
@@ -50,7 +51,8 @@ public class PathRunner implements Runnable {
 
                 if ((nextIndex >= 0 && nextIndex > currIndex)){
                     currIndex = nextIndex;
-                } else if (PlayerUtil.playerAt(targetNode) && p.isInWater()) {
+                    elapsedMoveTime = System.currentTimeMillis();
+                } else if (PlayerUtil.playerAt(targetNode) && (System.currentTimeMillis() - elapsedMoveTime) >= 300) {
                     currIndex++;
                 }
             } else {
@@ -65,7 +67,6 @@ public class PathRunner implements Runnable {
                 // goal.metGoal(new BetterBlockPos((int)(p.posX), (int)p.posY, (int)(p.posZ)))
 
                 if (PlayerUtil.playerAt(node)) {
-                   // moveForwardTask.cancel(true);
                     PlayerUtil.stopMovingForward();
                     break;
                 }
