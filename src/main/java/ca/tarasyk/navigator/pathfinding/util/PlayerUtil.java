@@ -21,12 +21,7 @@ public class PlayerUtil {
     }
 
     public static boolean entityAt(Entity e, BetterBlockPos pos) {
-        double a = e.posX < 0 ? Math.ceil(e.posX) : Math.floor(e.posX);
-        double b = e.posZ < 0 ? Math.ceil(e.posZ) : Math.floor(e.posZ);
-        double c = pos.getX() + 0.5 < 0 ? Math.ceil(pos.getX() + 0.5) : Math.floor(pos.getX()+ 0.5 );
-        double d = pos.getZ() + 0.5 < 0 ? Math.ceil(pos.getZ() + 0.5) : Math.floor(pos.getZ()+ 0.5 );
-
-        return a == c && b == d;
+        return Math.floor(e.posX) == pos.getX() && Math.floor(e.posZ) == pos.getZ();
     }
 
     public static boolean playerAt(BetterBlockPos pos) {
