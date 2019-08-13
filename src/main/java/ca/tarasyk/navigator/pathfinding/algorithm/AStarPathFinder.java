@@ -15,19 +15,10 @@ import java.util.*;
 public class AStarPathFinder extends PathFinder {
 
     private Long timeout;
-    private boolean failed;
 
     public AStarPathFinder(Goal goal, Long timeout) {
         super(goal);
         this.timeout = timeout;
-    }
-
-    public boolean hasFailed() {
-        return failed;
-    }
-
-    private void setFailed(boolean state) {
-        this.failed = state;
     }
 
     public Optional<BlockPosPath> search(PathNode src) {

@@ -5,7 +5,6 @@ import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.goals.Goal;
-import ca.tarasyk.navigator.pathfinding.movement.Move;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 

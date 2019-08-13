@@ -10,14 +10,12 @@ public class Heuristic {
         double dx = dst.getX() - src.getX();
         double dy = dst.getY() - src.getY();
         double dz = dst.getZ() - src.getZ();
-        // 2 * Math.abs(dy) because we can have an additional cost of 1 for pillaring
         return MoveConstants.MIN_ADMISSIBLE_DISTANCE * (Math.abs(dx) + Math.abs(dy) + Math.abs(dz));
     };
 
     public static BiFunction<BetterBlockPos, BetterBlockPos, Double> REALLY_FAST_HEURISTIC_XZ = (src, dst) -> {
         double dx = dst.getX() - src.getX();
         double dz = dst.getZ() - src.getZ();
-        // 2 * Math.abs(dy) because we can have an additional cost of 1 for pillaring
         return MoveConstants.MIN_ADMISSIBLE_DISTANCE * (Math.abs(dx) + Math.abs(dz));
     };
 

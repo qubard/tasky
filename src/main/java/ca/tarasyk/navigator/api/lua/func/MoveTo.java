@@ -97,7 +97,7 @@ public class MoveTo extends ThreeArgFunction {
                 Future f = NavigatorMod.executorService.submit(pathRunner);
                 f.get();
                 // If the pathFinder failed it did not reach the last node
-                // Recursion :)
+                // Recursively try to find the point again from the new position
                 return CoerceJavaToLua.coerce(call(arg1, arg2, arg3));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
