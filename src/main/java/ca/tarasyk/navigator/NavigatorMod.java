@@ -70,14 +70,7 @@ public class NavigatorMod
 
     @SubscribeEvent
     public void onChat(ServerChatEvent e) {
-        if (e.getMessage().equals("start")) {
-            start = new PathNode(new BetterBlockPos(NavigatorProvider.getPlayer().getPosition()));
-        } else if (e.getMessage().equals("end")) {
-            AStarPathFinder pathFinder = new AStarPathFinder(new GoalXZ(new BetterBlockPos(Minecraft.getMinecraft().player.getPosition())), (long) 3000);
-            Future<Optional<BlockPosPath>> future = executorService.submit(() -> pathFinder.search(start));
-            long start = System.currentTimeMillis();
-            foundPath = future;
-        } if (e.getMessage().equals("-load")) {
+         if (e.getMessage().equals("-load")) {
             executorService.submit(() -> {
                 try {
                     HookProvider.getProvider().unhook();
@@ -95,7 +88,6 @@ public class NavigatorMod
         } else {
             executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
         }
-        printDebugMessage(""+NavigatorProvider.getPlayer().posX +"," + NavigatorProvider.getPlayer().posZ);
     }
 
     public static void printDebugMessage(String msg) {

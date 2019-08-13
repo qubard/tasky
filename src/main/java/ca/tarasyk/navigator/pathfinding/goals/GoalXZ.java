@@ -4,8 +4,8 @@ import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
 
 public class GoalXZ extends Goal {
-    public GoalXZ(BetterBlockPos pos) {
-        super(pos);
+    public GoalXZ(int x, int z) {
+        super(new BetterBlockPos(x, z));
     }
 
     @Override

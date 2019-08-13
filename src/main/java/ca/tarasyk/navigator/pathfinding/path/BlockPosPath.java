@@ -15,12 +15,12 @@ public class BlockPosPath extends Path<BetterBlockPos> {
     }
 
     /**
-     * @param pos
-     * @return The index of the closest node to `pos` using the given heuristic
+     * @param start The start index
+     * @return `start` + 1 or start (whichever is closer to the player)
      */
-    public int indexForClosest(BetterBlockPos pos, BiFunction<BetterBlockPos, BetterBlockPos, Double> heuristic) {
-        int minIndex = 0;
-        for (int i = 0; i < nodes.size(); i++) {
+    public int nextClosest(int start) {
+        int minIndex = start;
+        for (int i = start; i < Math.min(start + 3, nodes.size()); i++) {
             BetterBlockPos node = getNode(i);
             EntityPlayer p = NavigatorProvider.getPlayer();
             double a = p.posX < 0 ? Math.ceil(p.posX) : Math.floor(p.posX);

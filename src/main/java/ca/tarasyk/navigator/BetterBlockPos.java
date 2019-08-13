@@ -17,6 +17,13 @@ public final class BetterBlockPos extends BlockPos {
         this.z = z;
     }
 
+    public BetterBlockPos(int x, int z) {
+        super(x, -1, z);
+        this.x = x;
+        this.y = -1;
+        this.z = z;
+    }
+
     public BetterBlockPos(double x, double y, double z) {
         this(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
     }

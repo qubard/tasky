@@ -3,7 +3,6 @@ package ca.tarasyk.navigator.pathfinding.goals;
 import ca.tarasyk.navigator.BetterBlockPos;
 
 public abstract class Goal implements IGoal {
-
     protected BetterBlockPos pos;
 
     public Goal(BetterBlockPos pos) {
@@ -16,5 +15,10 @@ public abstract class Goal implements IGoal {
 
     public BetterBlockPos getPos() {
         return pos;
+    }
+
+    @Override
+    public String toString() {
+        return pos.toString();
     }
 }

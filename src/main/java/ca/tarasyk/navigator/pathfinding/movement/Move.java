@@ -7,11 +7,11 @@ import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -61,6 +61,16 @@ public enum Move {
         return !block.isPassable(ctx, pos) || (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA || block == Blocks.FLOWING_WATER || block == Blocks.LEAVES || block == Blocks.LEAVES2);
     }
 
+    public static boolean isWater(WorldClient ctx, BlockPos pos) {
+        Block block = ctx.getBlockState(pos).getBlock();
+        return block == Blocks.FLOWING_WATER || block == Blocks.WATER;
+    }
+
+    public static boolean isLava(WorldClient ctx, BlockPos pos) {
+        Block block = ctx.getBlockState(pos).getBlock();
+        return block == Blocks.LAVA || block == Blocks.FLOWING_LAVA;
+    }
+
     public static boolean isStrictlySolid(WorldClient ctx, BlockPos pos) {
         Block block = ctx.getBlockState(pos).getBlock();
         return !block.isPassable(ctx, pos);
@@ -83,7 +93,7 @@ public enum Move {
             BetterBlockPos remove = toRemove.peek();
             if (Move.isStrictlySolid(NavigatorProvider.getWorld(), remove)) {
                 NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
-                PlayerUtil.lookAt(remove);
+                PlayerUtil.lookAtXZ(remove);
                 NavigatorProvider.getMinecraft().playerController.onPlayerDamageBlock(remove, EnumFacing.UP);
                 NavigatorProvider.getMinecraft().effectRenderer.addBlockHitEffects(remove, EnumFacing.UP);
                 NavigatorProvider.getMinecraft().player.swingArm(EnumHand.MAIN_HAND);
@@ -115,18 +125,26 @@ public enum Move {
      */
     public static Optional<Double> calculateCost(WorldClient ctx, PathNode src, PathNode dest) {
         int dy = dest.getPos().getY() - src.getPos().getY();
-        boolean NOT_CLIMBING_OR_ASCENDING = dy == 0;
-        boolean movingXZ = dest.getPos().getX() - src.getPos().getZ() != 0 || dest.getPos().getZ() - src.getPos().getZ() != 0;
+        boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
 
         if (dest.getPos().getZ() - src.getPos().getZ() != 0 && dest.getPos().getX() - src.getPos().getX() != 0) {
+            return Optional.ofNullable(null);
+        }
+
+        if (isLava(ctx, dest.getPos().down()) || isLava(ctx, dest.getPos())) {
             return Optional.ofNullable(null);
         }
 
         double totalCost = Heuristic.REALLY_FAST_HEURISTIC_XZ.apply(src.getPos(), dest.getPos());
 
         // Trying to climb but not pillaring straight up, increases search space complexity
-        if (!isSolid(ctx, dest.getPos().down())) {
+        if (!isSolid(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos().down()) || (isWater(ctx, dest.getPos().down()) && isWater(ctx, dest.getPos().up()))) {
             // Nothing to stand on, or unloaded chunk, dest block is solid (can't jump on it), or we have to dig to get to the block
+            return Optional.ofNullable(null);
+        }
+
+        // Avoids the weird case where the node path is above the water
+        if (!isSolid(ctx, dest.getPos()) && isWater(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos())) {
             return Optional.ofNullable(null);
         }
 
