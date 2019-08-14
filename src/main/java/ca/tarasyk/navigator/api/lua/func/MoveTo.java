@@ -9,7 +9,6 @@ import ca.tarasyk.navigator.pathfinding.goal.Goal;
 import ca.tarasyk.navigator.pathfinding.goal.GoalXZ;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
@@ -30,12 +29,18 @@ public class MoveTo extends ThreeArgFunction {
     }
     // rx, rz need to be object parameters for moveTo, same with the 5s
 
+    /**
+     * @param arg1 The x-coordinate
+     * @param arg2 The y-coordinate
+     * @param arg3 The z-coordinate
+     * @return If we were able to pathfind to <x, y, z>
+     */
     @Override
     public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
-        int x = arg1.checkint();
-        int y = arg2.checkint();
-        int z = arg3.checkint();
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        int x = (int) Math.floor(arg1.checkdouble());
+        int y = (int) Math.floor(arg2.checkdouble());
+        int z = (int) Math.floor(arg3.checkdouble());
+        EntityPlayer player = NavigatorProvider.getMinecraft().player;
         BetterBlockPos playerPos = new BetterBlockPos(player.getPosition());
         Goal goal = new GoalXZ(x, z);
         boolean isLoaded = NavigatorProvider.getWorld().getChunkFromChunkCoords(x >> 4, z >> 4).isLoaded();

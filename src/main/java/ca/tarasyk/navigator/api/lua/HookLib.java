@@ -1,8 +1,6 @@
 package ca.tarasyk.navigator.api.lua;
 
-import ca.tarasyk.navigator.api.lua.func.MoveTo;
-import ca.tarasyk.navigator.api.lua.func.MoveToXZ;
-import ca.tarasyk.navigator.api.lua.func.PrintChat;
+import ca.tarasyk.navigator.api.lua.func.*;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
@@ -13,9 +11,14 @@ public class HookLib extends TwoArgFunction {
         LuaValue table = tableOf();
         table.set("add", new HookAdd());
         env.set("hook", table);
+        env.set("attack", new LeftClick());
+        env.set("drop", new Drop());
+        env.set("dropAll", new DropAll());
+        env.set("putInChest", new PutInChest());
         env.set("printChat", new PrintChat());
         env.set("moveTo", new MoveTo(30));
         env.set("moveToXZ", new MoveToXZ());
+        env.set("rightClickBlock", new RightClickBlock());
         return root;
     }
 
