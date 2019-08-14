@@ -104,6 +104,7 @@ public class MoveTo extends ThreeArgFunction {
                     // the closest we got and "go there"
                     // rx and rz are shifts which lets us go into a diff direction
                     int rMag = random.nextInt(64) - 24;
+                    angle = Math.random() * Math.PI;
                     ox = (int) (rMag * Math.cos(angle));
                     oz = (int) (rMag * Math.sin(angle));
                     nAttempts++;

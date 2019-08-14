@@ -62,7 +62,7 @@ public class NavigatorMod
     }
 
     @SubscribeEvent
-    public void onChat(LivingHurtEvent e) {
+    public void onLivingHurt(LivingHurtEvent e) {
         executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
     }
 
