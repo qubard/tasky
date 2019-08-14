@@ -3,6 +3,7 @@ package ca.tarasyk.navigator.api.lua.func;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
 import ca.tarasyk.navigator.pathfinding.movement.PathRunner;
 import ca.tarasyk.navigator.pathfinding.goal.Goal;
@@ -116,7 +117,7 @@ public class MoveTo extends ThreeArgFunction {
                 } while (nAttempts < maxFailAttempts);
 
                 if (nAttempts >= maxFailAttempts) {
-                    return CoerceJavaToLua.coerce(false);
+                    return LuaConstants.FALSE;
                 }
 
                 NavigatorMod.path = potentialPath.get();
@@ -132,6 +133,6 @@ public class MoveTo extends ThreeArgFunction {
             }
         }
 
-        return CoerceJavaToLua.coerce(false);
+        return LuaConstants.FALSE;
     }
 }

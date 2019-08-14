@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua;
+package ca.tarasyk.navigator.api.lua.hook;
 
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;

@@ -1,7 +1,7 @@
 package ca.tarasyk.navigator.api.lua.func;
 
-import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -31,7 +31,7 @@ public class RightClickBlock extends ThreeArgFunction {
         // Too far, can't reach
         float reach = NavigatorProvider.getMinecraft().playerController.getBlockReachDistance();
         if (Math.sqrt(player.getDistanceSqToCenter(new BlockPos(x, y, z))) > reach) {
-            return CoerceJavaToLua.coerce(false);
+            return LuaConstants.FALSE;
         }
         PlayerUtil.lookAtXYZ(x, y, z);
         EnumActionResult result = NavigatorProvider.getMinecraft().playerController.processRightClickBlock(player, world,

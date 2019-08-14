@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua;
+package ca.tarasyk.navigator.api.lua.hook;
 
 import java.util.Arrays;
 import java.util.Optional;

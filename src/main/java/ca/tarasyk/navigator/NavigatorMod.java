@@ -1,8 +1,8 @@
 package ca.tarasyk.navigator;
 
-import ca.tarasyk.navigator.api.lua.Hook;
-import ca.tarasyk.navigator.api.lua.HookLib;
-import ca.tarasyk.navigator.api.lua.HookProvider;
+import ca.tarasyk.navigator.api.lua.hook.Hook;
+import ca.tarasyk.navigator.api.lua.hook.HookLib;
+import ca.tarasyk.navigator.api.lua.hook.HookProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import net.minecraft.client.Minecraft;
