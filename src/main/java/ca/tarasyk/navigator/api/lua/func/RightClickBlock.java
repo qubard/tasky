@@ -12,7 +12,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 public class RightClickBlock extends ThreeArgFunction {
     /**
@@ -36,6 +35,6 @@ public class RightClickBlock extends ThreeArgFunction {
         PlayerUtil.lookAtXYZ(x, y, z);
         EnumActionResult result = NavigatorProvider.getMinecraft().playerController.processRightClickBlock(player, world,
                 new BlockPos(x, y, z), EnumFacing.DOWN, player.getLookVec(), EnumHand.MAIN_HAND);
-        return CoerceJavaToLua.coerce(result == EnumActionResult.SUCCESS);
+        return LuaValue.valueOf(result == EnumActionResult.SUCCESS);
     }
 }

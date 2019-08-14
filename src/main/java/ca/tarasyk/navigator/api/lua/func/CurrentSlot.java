@@ -4,10 +4,9 @@ import ca.tarasyk.navigator.NavigatorProvider;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-public class DropAll extends ZeroArgFunction {
+public class CurrentSlot extends ZeroArgFunction {
     @Override
     public LuaValue call() {
-        NavigatorProvider.getMinecraft().playerController.sendPacketDropItem(NavigatorProvider.getPlayer().inventory.getCurrentItem());
-        return null;
+        return LuaValue.valueOf(NavigatorProvider.getPlayer().inventory.currentItem);
     }
 }

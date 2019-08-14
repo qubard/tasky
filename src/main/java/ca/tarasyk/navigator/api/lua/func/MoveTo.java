@@ -58,7 +58,7 @@ public class MoveTo extends ThreeArgFunction {
                     Future f = NavigatorMod.executorService.submit(pathRunner);
                     f.get();
                     // If the pathFinder failed it did not reach the last node
-                    return CoerceJavaToLua.coerce(!pathFinder.hasFailed());
+                    return LuaValue.valueOf(!pathFinder.hasFailed());
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

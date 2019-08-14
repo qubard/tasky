@@ -33,6 +33,11 @@ public class HookProvider {
         return Optional.ofNullable(hookTable.get(hook));
     }
 
+    /**
+     * @param hook The function to be hooked
+     * @param event The event dispatched to the hooked func
+     * @return Whether the dispatch succeeded or not
+     */
     public boolean dispatch(Hook hook, Object event) {
         Optional<LuaFunction> func = getFunction(hook);
         if (func.isPresent()) {

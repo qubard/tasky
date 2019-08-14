@@ -4,10 +4,10 @@ import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-public class Drop extends ZeroArgFunction {
+public class DropStack extends ZeroArgFunction {
     @Override
     public LuaValue call() {
-        PlayerUtil.drop(false);
+        PlayerUtil.drop(true);
         return null;
     }
 }

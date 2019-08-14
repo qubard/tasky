@@ -5,6 +5,7 @@ import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ClickType;
 
 public class PlayerUtil {
     public static void lookAtXZ(BetterBlockPos pos) {
@@ -40,6 +41,18 @@ public class PlayerUtil {
     public static void stopMovingForward() {
         NavigatorProvider.getPlayer().moveForward = 0.0f;
         NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
+    }
+
+    /**
+     * @param all Whether or not we drop the entire stack
+     */
+    public static void drop(boolean all) {
+        NavigatorProvider.getMinecraft().playerController.windowClick(
+                0,
+                36 + NavigatorProvider.getPlayer().inventory.currentItem,
+                all ? 1 : 0,
+                ClickType.THROW,
+                NavigatorProvider.getPlayer());
     }
 
     public static void lookAtXYZ(BetterBlockPos pos) {
