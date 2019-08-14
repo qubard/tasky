@@ -1,6 +1,7 @@
-package ca.tarasyk.navigator.pathfinding.goals;
+package ca.tarasyk.navigator.pathfinding.goal;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.pathfinding.node.PathNode;
 
 public abstract class Goal implements IGoal {
     protected BetterBlockPos pos;
@@ -15,6 +16,10 @@ public abstract class Goal implements IGoal {
 
     public BetterBlockPos getPos() {
         return pos;
+    }
+
+    public PathNode toPathNode() {
+        return new PathNode(pos);
     }
 
     @Override

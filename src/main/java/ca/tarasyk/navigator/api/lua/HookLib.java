@@ -14,7 +14,7 @@ public class HookLib extends TwoArgFunction {
         table.set("add", new HookAdd());
         env.set("hook", table);
         env.set("printChat", new PrintChat());
-        env.set("moveTo", new MoveTo());
+        env.set("moveTo", new MoveTo(30));
         env.set("moveToXZ", new MoveToXZ());
         return root;
     }

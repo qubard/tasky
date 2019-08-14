@@ -8,16 +8,11 @@ import net.minecraft.entity.player.EntityPlayer;
 public class PlayerUtil {
     public static void lookAtXZ(BetterBlockPos pos) {
         EntityPlayer p = NavigatorProvider.getPlayer();
-        double dx = p.posX - (double) (pos.getX() + 0.5);
-        double dz = p.posZ - (double) (pos.getZ() + 0.5);
-        float yaw = (float) (Math.atan2(dx, dz) * 180f / Math.PI);
-        yaw = 180 - yaw;
+        double dx = p.posX - (pos.getX() + 0.5);
+        double dz = p.posZ - (pos.getZ() + 0.5);
+        float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
         p.rotationYaw = yaw;
-        if ((int) p.posY > pos.getY()) {
-            p.rotationPitch = 90f;
-        } else {
-            p.rotationPitch = 45f;
-        }
+        p.rotationPitch = 0f;
     }
 
     public static boolean entityAt(Entity e, BetterBlockPos pos) {
@@ -33,6 +28,7 @@ public class PlayerUtil {
     }
 
     public static void moveForward() {
+        NavigatorProvider.getPlayer().moveForward = 1.0f;
         NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), true);
     }
 

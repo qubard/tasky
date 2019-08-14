@@ -126,8 +126,9 @@ public enum Move {
     public static Optional<Double> calculateCost(WorldClient ctx, PathNode src, PathNode dest) {
         int dy = dest.getPos().getY() - src.getPos().getY();
         boolean NOT_CLIMBING_OR_ASCENDING = dest.getPos().getY() - src.getPos().getY() == 0;
+        boolean MOVING_DIAGONALLY = dest.getPos().getZ() - src.getPos().getZ() != 0 && dest.getPos().getX() - src.getPos().getX() != 0;
 
-        if (dest.getPos().getZ() - src.getPos().getZ() != 0 && dest.getPos().getX() - src.getPos().getX() != 0) {
+        if (MOVING_DIAGONALLY) {
             return Optional.ofNullable(null);
         }
 

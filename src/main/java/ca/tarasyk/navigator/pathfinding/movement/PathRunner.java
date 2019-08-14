@@ -1,10 +1,10 @@
-package ca.tarasyk.navigator.pathfinding.algorithm;
+package ca.tarasyk.navigator.pathfinding.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.goals.Goal;
+import ca.tarasyk.navigator.pathfinding.goal.Goal;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -27,7 +27,7 @@ public class PathRunner implements Runnable {
         EntityPlayer p = NavigatorProvider.getPlayer();
 
         int currIndex = path.nextClosest(0);
-        long elapsedMoveTime = 0; // So we don't get stuck at a node (very rare, but sort of unpreventable)
+        long elapsedMoveTime = 0; // So we don't get stuck at a node (a little bit unpreventable)
 
         while (true) {
             if (currIndex + 1 < nodes.size()) {
@@ -40,14 +40,6 @@ public class PathRunner implements Runnable {
                 // Does the player have to jump up? (the target node is a block above), or in water
                 PlayerUtil.moveForward();
                 PlayerUtil.jump((targetNode.getY() - (int)p.posY >= 1) || NavigatorProvider.getPlayer().isInWater());
-
-                if (!p.isInWater()) {
-                    if (p.posY > targetNode.getY()) {
-                        p.rotationPitch = 20f;
-                    } else {
-                        p.rotationPitch = 0f;
-                    }
-                }
 
                 if ((nextIndex >= 0 && nextIndex > currIndex)){
                     currIndex = nextIndex;
@@ -70,12 +62,6 @@ public class PathRunner implements Runnable {
                     PlayerUtil.stopMovingForward();
                     break;
                 }
-            }
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
 

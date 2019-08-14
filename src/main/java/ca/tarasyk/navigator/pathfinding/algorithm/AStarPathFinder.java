@@ -1,36 +1,47 @@
 package ca.tarasyk.navigator.pathfinding.algorithm;
 
+import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.score.AStarScore;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
-import ca.tarasyk.navigator.pathfinding.goals.Goal;
+import ca.tarasyk.navigator.pathfinding.goal.Goal;
 import ca.tarasyk.navigator.pathfinding.movement.Move;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.node.PathNodeCompare;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextComponentString;
 
 import java.util.*;
 
 public class AStarPathFinder extends PathFinder {
 
     private Long timeout;
+    private Queue<PathNode> openSet;
+    private Set<PathNode> closedSet;
 
-    public AStarPathFinder(Goal goal, Long timeout) {
-        super(goal);
+    public AStarPathFinder(Long timeout) {
         this.timeout = timeout;
+        openSet = new PriorityQueue<>(new PathNodeCompare());
+        closedSet =  new HashSet<>();
     }
 
-    public Optional<BlockPosPath> search(PathNode src) {
-        Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
-        Set<PathNode> closedSet = new HashSet<>();
-
+    public Optional<BlockPosPath> search(PathNode src, Goal goal) {
+        // We can speed up finding alternative paths to other locations
+        // by just re-using openSet and closedSet (the heuristics will be inaccurate tho)
+        // wait, no it won't, because it'll still be going in the same direction
+        // And checking closedSet for the node on more attempts
         Long start = System.currentTimeMillis();
 
-        src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src.getPos())));
-        openSet.add(src);
+        PathNode curr = null;
 
-        PathNode curr = src;
+        if (closedSet.isEmpty()) {
+            src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src.getPos())));
+            openSet.add(src);
+            curr = src;
+        } else if (closedSet.contains(goal.toPathNode())) {
+            PathNode dest = new PathNode(goal.getPos());
+            NavigatorMod.printDebugMessage("Found in closedSet");
+            return Optional.of(new BlockPosPath(dest.pathFrom()));
+        }
+
         setFailed(false);
 
         while (!openSet.isEmpty()) {
@@ -40,13 +51,13 @@ public class AStarPathFinder extends PathFinder {
             if (goal.metGoal(curr.getPos())) {
                 PathNode dest = new PathNode(goal.getPos());
                 dest.setParent(curr);
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered."));
+                NavigatorMod.printDebugMessage(closedSet.size() + " movements considered.");
                 return Optional.of(new BlockPosPath(dest.pathFrom()));
             }
 
             // Return the best path so far if we timeout
             if (System.currentTimeMillis() - start > timeout) {
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered, timeout"));
+                NavigatorMod.printDebugMessage(closedSet.size() + " movements considered, timeout");
                 setFailed(true);
                 return Optional.of(new BlockPosPath(curr.pathFrom()));
             }
@@ -81,7 +92,7 @@ public class AStarPathFinder extends PathFinder {
         }
 
         setFailed(true);
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(closedSet.size() + " movements considered, but no path existed"));
+        NavigatorMod.printDebugMessage(closedSet.size() + " movements considered, but no path existed");
         return Optional.of(new BlockPosPath(curr.pathFrom()));
     }
 }
