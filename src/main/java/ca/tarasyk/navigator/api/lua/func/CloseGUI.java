@@ -11,9 +11,9 @@ public class CloseGUI extends OneArgFunction {
      */
     @Override
     public LuaValue call(LuaValue arg) {
-        int waitTimeMs = arg.checkint();
+        long waitTimeMs = arg.checklong();
         long start = System.currentTimeMillis();
-        while (NavigatorProvider.getMinecraft().currentScreen == null && (System.currentTimeMillis() - start < (long) waitTimeMs)) { }
+        while (NavigatorProvider.getMinecraft().currentScreen == null && (System.currentTimeMillis() - start < waitTimeMs)) { }
         NavigatorProvider.getPlayer().closeScreen();
         NavigatorProvider.getMinecraft().displayGuiScreen(null);
         return null;

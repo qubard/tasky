@@ -13,6 +13,7 @@ public class HookLib extends TwoArgFunction {
         env.set("hook", table);
         env.set("attack", new LeftClick());
         env.set("drop", new Drop());
+        env.set("sleep", new Sleep());
         env.set("closeGUI", new CloseGUI());
         env.set("dropStack", new DropStack());
         env.set("putInChest", new PutInChest());
