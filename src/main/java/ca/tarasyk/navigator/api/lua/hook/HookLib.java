@@ -17,6 +17,7 @@ public class HookLib extends TwoArgFunction {
         env.set("setLoop", new SetLoop());
         env.set("hook", table);
         env.set("attack", new LeftClick());
+        env.set("consumeItem", new ConsumeItem());
         env.set("drop", new Drop());
         env.set("sleep", new Sleep());
         env.set("attackMouseover", new AttackMouseover());

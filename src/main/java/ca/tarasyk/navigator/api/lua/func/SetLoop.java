@@ -14,7 +14,9 @@ public class SetLoop extends TwoArgFunction {
             while (func.call().checkboolean()) {
                 try {
                     Thread.sleep(delayMs);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    break;
+                }
             } // Call the function over and over so long as it returns true
         });
         return null;

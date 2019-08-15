@@ -1,11 +1,19 @@
 package ca.tarasyk.navigator.api.lua.func;
 
+import ca.tarasyk.navigator.NavigatorProvider;
+import net.minecraft.client.settings.KeyBinding;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2.lib.OneArgFunction;
 
-public class ConsumeItem extends ZeroArgFunction {
+public class ConsumeItem extends OneArgFunction {
     @Override
-    public LuaValue call() {
+    public LuaValue call(LuaValue arg1) {
+        int holdTimeMs = arg1.checkint();
+        KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindUseItem.getKeyCode(), true);
+        try {
+            Thread.sleep(holdTimeMs);
+        } catch (InterruptedException e) {}
+        KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindUseItem.getKeyCode(), false);
         return null;
     }
 }
