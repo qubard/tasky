@@ -46,7 +46,7 @@ public class PlayerUtil {
     /**
      * @param all Whether or not we drop the entire stack
      */
-    public static void drop(boolean all) {
+    public static void dropHeld(boolean all) {
         NavigatorProvider.getMinecraft().playerController.windowClick(
                 0,
                 36 + NavigatorProvider.getPlayer().inventory.currentItem,

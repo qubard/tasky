@@ -7,7 +7,7 @@ import org.luaj.vm2.lib.ZeroArgFunction;
 public class Drop extends ZeroArgFunction {
     @Override
     public LuaValue call() {
-        PlayerUtil.drop(false);
+        PlayerUtil.dropHeld(false);
         return null;
     }
 }

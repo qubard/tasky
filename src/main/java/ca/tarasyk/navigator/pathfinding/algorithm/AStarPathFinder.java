@@ -13,12 +13,12 @@ import java.util.*;
 
 public class AStarPathFinder extends PathFinder {
 
-    private Long timeout;
+    private Long timeoutMs;
     private Queue<PathNode> openSet;
     private Set<PathNode> closedSet;
 
-    public AStarPathFinder(Long timeout) {
-        this.timeout = timeout;
+    public AStarPathFinder(Long timeoutMs) {
+        this.timeoutMs = timeoutMs;
         openSet = new PriorityQueue<>(new PathNodeCompare());
         closedSet =  new HashSet<>();
     }
@@ -56,7 +56,7 @@ public class AStarPathFinder extends PathFinder {
             }
 
             // Return the best path so far if we timeout
-            if (System.currentTimeMillis() - start > timeout) {
+            if (System.currentTimeMillis() - start > timeoutMs) {
                 NavigatorMod.printDebugMessage(closedSet.size() + " movements considered, timeout");
                 setFailed(true);
                 return Optional.of(new BlockPosPath(curr.pathFrom()));
