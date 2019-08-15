@@ -7,14 +7,14 @@ import org.luaj.vm2.lib.OneArgFunction;
 public class CloseGUI extends OneArgFunction {
     /**
      * @param arg The time in milliseconds to wait before closing
-     * @return
+     * @return Nothing, but close any open GUI
      */
     @Override
     public LuaValue call(LuaValue arg) {
         int waitTimeMs = arg.checkint();
         long start = System.currentTimeMillis();
-        while (NavigatorProvider.getMinecraft().currentScreen == null || (System.currentTimeMillis() - start < waitTimeMs)) { }
-        NavigatorProvider.getMinecraft().player.closeScreen();
+        while (NavigatorProvider.getMinecraft().currentScreen == null && (System.currentTimeMillis() - start < (long) waitTimeMs)) { }
+        NavigatorProvider.getPlayer().closeScreen();
         NavigatorProvider.getMinecraft().displayGuiScreen(null);
         return null;
     }
