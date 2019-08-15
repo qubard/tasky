@@ -17,6 +17,7 @@ public class HookLib extends TwoArgFunction {
         env.set("attack", new LeftClick());
         env.set("drop", new Drop());
         env.set("sleep", new Sleep());
+        env.set("attackMouseover", new AttackMouseover());
         env.set("lookAt", new LookAt());
         env.set("leftClick", new LeftClick());
         env.set("closeGUI", new CloseGUI());
@@ -24,7 +25,7 @@ public class HookLib extends TwoArgFunction {
         env.set("dropStack", new DropStack());
         env.set("foodStats", new FoodStats());
         env.set("digBlock", new DigBlock());
-        env.set("countMobsAt", new CountMobsAt());
+        env.set("countMobs", new CountMobs());
         env.set("putInChest", new PutInChest());
         env.set("printChat", new PrintChat());
         env.set("currentSlot", new CurrentSlot());

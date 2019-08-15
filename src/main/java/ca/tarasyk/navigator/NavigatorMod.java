@@ -83,7 +83,10 @@ public class NavigatorMod
                     printDebugMessage("Failed to load: " + errMsg);
                 }
             });
-        } else {
+        } else if(e.getMessage().equals("/stop")) {
+            executorService.shutdown();
+            executorService = Executors.newFixedThreadPool(4);
+         } else {
             executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
         }
     }
