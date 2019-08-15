@@ -6,9 +6,9 @@ import org.luaj.vm2.lib.OneArgFunction;
 public class Sleep extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue arg) {
-        long time = arg.checklong();
+        long timeMs = Math.max(arg.checklong(), 0);
         try {
-            Thread.sleep(time);
+            Thread.sleep(timeMs);
         } catch (InterruptedException e) {
             // Do nothing
         }
