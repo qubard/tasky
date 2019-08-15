@@ -71,7 +71,7 @@ public class MoveTo extends ThreeArgFunction {
             int dx = x - possibleX;
             int dz = z - possibleZ;
 
-            double angle = Math.atan2((double)dz, (double)(dx));
+            double angle = Math.atan2(dz, dx);
 
             // Find the limit to where the next chunk is unloaded
             // This is 5 chunks because we want to traverse in roughly d = 90 blocks

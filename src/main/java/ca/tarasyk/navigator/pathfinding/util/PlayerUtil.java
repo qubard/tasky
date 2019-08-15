@@ -3,9 +3,12 @@ package ca.tarasyk.navigator.pathfinding.util;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.util.math.BlockPos;
 
 public class PlayerUtil {
     public static void lookAtXZ(BetterBlockPos pos) {
@@ -25,6 +28,10 @@ public class PlayerUtil {
         return Math.floor(e.posX) == pos.getX() && Math.floor(e.posZ) == pos.getZ();
     }
 
+    public static boolean entityAtXYZ(Entity e, BetterBlockPos pos) {
+        return Math.floor(e.posX) == pos.getX() && Math.floor(e.posZ) == pos.getZ() && Math.floor(e.posY) == pos.getY();
+    }
+
     public static boolean playerAt(BetterBlockPos pos) {
         return entityAt(NavigatorProvider.getPlayer(), pos);
     }
@@ -41,6 +48,12 @@ public class PlayerUtil {
     public static void stopMovingForward() {
         NavigatorProvider.getPlayer().moveForward = 0.0f;
         NavigatorProvider.getMinecraft().gameSettings.keyBindForward.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
+    }
+
+    public static boolean canReach(int x, int y, int z) {
+        EntityPlayer player = NavigatorProvider.getPlayer();
+        float reach = NavigatorProvider.getMinecraft().playerController.getBlockReachDistance();
+        return Math.sqrt(player.getDistanceSqToCenter(new BlockPos(x, y, z))) < reach;
     }
 
     /**
@@ -69,5 +82,9 @@ public class PlayerUtil {
 
     public static void lookAtXYZ(int x, int y, int z) {
         lookAtXYZ(new BetterBlockPos(x, y, z));
+    }
+
+    public static void attack(boolean state) {
+        KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindAttack.getKeyCode(), state);
     }
 }

@@ -76,6 +76,11 @@ public enum Move {
         return !block.isPassable(ctx, pos);
     }
 
+    public static boolean isStrictlySolid(BlockPos pos) {
+        WorldClient ctx = NavigatorProvider.getWorld();
+        return isStrictlySolid(ctx, pos);
+    }
+
     public static void digSideBlocks(BetterBlockPos pos, int dx, int dz) {
         BetterBlockPos left = new BetterBlockPos(dx, 0, 0);
         BetterBlockPos right = new BetterBlockPos(0, 0, dz);

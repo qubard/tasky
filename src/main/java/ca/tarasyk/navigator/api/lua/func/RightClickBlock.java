@@ -25,13 +25,14 @@ public class RightClickBlock extends ThreeArgFunction {
         int x = (int) Math.floor(arg1.checkdouble());
         int y = (int) Math.floor(arg2.checkdouble());
         int z = (int) Math.floor(arg3.checkdouble());
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        WorldClient world = NavigatorProvider.getWorld();
+
         // Too far, can't reach
-        float reach = NavigatorProvider.getMinecraft().playerController.getBlockReachDistance();
-        if (Math.sqrt(player.getDistanceSqToCenter(new BlockPos(x, y, z))) > reach) {
+        if (!PlayerUtil.canReach(x, y, z)) {
             return LuaConstants.FALSE;
         }
+
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        WorldClient world = NavigatorProvider.getWorld();
         PlayerUtil.lookAtXYZ(x, y, z);
         EnumActionResult result = NavigatorProvider.getMinecraft().playerController.processRightClickBlock(player, world,
                 new BlockPos(x, y, z), EnumFacing.DOWN, player.getLookVec(), EnumHand.MAIN_HAND);

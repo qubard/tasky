@@ -3,12 +3,17 @@ package ca.tarasyk.navigator.api.lua.func;
 import ca.tarasyk.navigator.NavigatorProvider;
 import net.minecraft.client.settings.KeyBinding;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.ZeroArgFunction;
+import org.luaj.vm2.lib.OneArgFunction;
 
-public class LeftClick extends ZeroArgFunction {
+public class LeftClick extends OneArgFunction {
     @Override
-    public LuaValue call() {
+    public LuaValue call(LuaValue arg) {
+        long holdTimeMs = Math.max(0, arg.checklong());
         KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindAttack.getKeyCode(), true);
+        try {
+            Thread.sleep(holdTimeMs);
+        } catch (InterruptedException e) {}
+        KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindAttack.getKeyCode(), false);
         return null;
     }
 }
