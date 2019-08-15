@@ -4,6 +4,7 @@ import ca.tarasyk.navigator.api.lua.func.*;
 import ca.tarasyk.navigator.api.lua.func.getters.CurrentSlot;
 import ca.tarasyk.navigator.api.lua.func.getters.ExperienceLevel;
 import ca.tarasyk.navigator.api.lua.func.getters.FoodStats;
+import ca.tarasyk.navigator.api.lua.func.getters.SlotDurability;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
@@ -13,6 +14,7 @@ public class HookLib extends TwoArgFunction {
         LuaValue root = tableOf();
         LuaValue table = tableOf();
         table.set("add", new HookAdd());
+        env.set("setLoop", new SetLoop());
         env.set("hook", table);
         env.set("attack", new LeftClick());
         env.set("drop", new Drop());
@@ -20,6 +22,7 @@ public class HookLib extends TwoArgFunction {
         env.set("attackMouseover", new AttackMouseover());
         env.set("lookAt", new LookAt());
         env.set("leftClick", new LeftClick());
+        env.set("slotDurability", new SlotDurability());
         env.set("closeGUI", new CloseGUI());
         env.set("expLevel", new ExperienceLevel());
         env.set("dropStack", new DropStack());
