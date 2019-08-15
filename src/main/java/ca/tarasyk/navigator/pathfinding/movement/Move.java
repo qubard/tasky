@@ -11,7 +11,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -154,7 +153,7 @@ public enum Move {
             return Optional.ofNullable(null);
         }
 
-        if (isSolid(ctx, dest.getPos())) {
+        if (isSolid(ctx, dest.getPos()) || !isSolid(ctx, dest.getPos().down())) {
             return Optional.ofNullable(null);
         }
 
@@ -172,7 +171,7 @@ public enum Move {
             if (isSolid(ctx, src.getPos().up().up()) || isSolid(ctx, dest.getPos().up())) {
                 return Optional.ofNullable(null);
             }
-        } else {
+        } else if (dy < 0) {
             if (isSolid(ctx, dest.getPos().up().up()) || isSolid(ctx, dest.getPos().up())) {
                 return Optional.ofNullable(null);
             }
