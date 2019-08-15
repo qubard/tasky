@@ -1,5 +1,6 @@
 package ca.tarasyk.navigator;
 
+import ca.tarasyk.navigator.api.lua.LuaExecutor;
 import ca.tarasyk.navigator.api.lua.hook.Hook;
 import ca.tarasyk.navigator.api.lua.hook.HookLib;
 import ca.tarasyk.navigator.api.lua.hook.HookProvider;
@@ -47,7 +48,6 @@ public class NavigatorMod
     // this is all very temporary and dumb still
     PathNode start = new PathNode(23, 4, -9);
     Future<Optional<BlockPosPath>> foundPath;
-    public static ExecutorService executorService;
 
     public static LuaFunction chatFuncHook = null;
 
@@ -64,13 +64,13 @@ public class NavigatorMod
 
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent e) {
-        executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
+        LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
     }
 
     @SubscribeEvent
     public void onChat(ServerChatEvent e) {
          if (e.getMessage().equals("-load")) {
-            executorService.submit(() -> {
+             LuaExecutor.get().submit(() -> {
                 try {
                     HookProvider.getProvider().unhook();
                     Globals globals = JsePlatform.standardGlobals();
@@ -84,11 +84,8 @@ public class NavigatorMod
                     printDebugMessage("Failed to load: " + errMsg);
                 }
             });
-        } else if(e.getMessage().equals("/stop")) {
-            executorService.shutdown();
-            executorService = Executors.newFixedThreadPool(4);
-         } else {
-            executorService.submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
+        } else {
+             LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
         }
     }
 
@@ -139,7 +136,6 @@ public class NavigatorMod
     public void init(FMLInitializationEvent event)
     {
         this.prepopulateTickList();
-        executorService = Executors.newFixedThreadPool(4);
         MinecraftForge.EVENT_BUS.register(this);
         /*Thread th = new Thread(new Runnable(){
                 @Override

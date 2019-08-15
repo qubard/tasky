@@ -4,6 +4,7 @@ import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
+import ca.tarasyk.navigator.api.lua.LuaExecutor;
 import ca.tarasyk.navigator.pathfinding.algorithm.AStarPathFinder;
 import ca.tarasyk.navigator.pathfinding.movement.PathRunner;
 import ca.tarasyk.navigator.pathfinding.goal.Goal;
@@ -49,13 +50,13 @@ public class MoveTo extends ThreeArgFunction {
 
         if (isLoaded) {
             AStarPathFinder pathFinder = new AStarPathFinder((long) 3000);
-            Future<Optional<BlockPosPath>> future = NavigatorMod.executorService.submit(() -> pathFinder.search(new PathNode(playerPos), goal));
+            Future<Optional<BlockPosPath>> future = LuaExecutor.get().submit(() -> pathFinder.search(new PathNode(playerPos), goal));
             try {
                 Optional<BlockPosPath> potentialPath = future.get();
                 if (!pathFinder.hasFailed()) {
                     NavigatorMod.path = potentialPath.get();
                     PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
-                    Future f = NavigatorMod.executorService.submit(pathRunner);
+                    Future f = LuaExecutor.get().submit(pathRunner);
                     f.get();
                     // If the pathFinder failed it did not reach the last node
                     return LuaValue.valueOf(!pathFinder.hasFailed());
@@ -98,7 +99,7 @@ public class MoveTo extends ThreeArgFunction {
                     int tz = possibleZ + oz + rz;
                     NavigatorMod.printDebugMessage("Trying " + tx + "," + tz);
                     AStarPathFinder finalPathFinder = new AStarPathFinder((long) 2000);
-                    future = NavigatorMod.executorService.submit(() -> finalPathFinder.search(new PathNode(playerPos), new GoalXZ(tx, tz)));
+                    future = LuaExecutor.get().submit(() -> finalPathFinder.search(new PathNode(playerPos), new GoalXZ(tx, tz)));
                     potentialPath = future.get();
                     if (!finalPathFinder.hasFailed()) {
                         break;
@@ -122,7 +123,7 @@ public class MoveTo extends ThreeArgFunction {
 
                 NavigatorMod.path = potentialPath.get();
                 PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
-                Future f = NavigatorMod.executorService.submit(pathRunner);
+                Future f = LuaExecutor.get().submit(pathRunner);
                 f.get();
                 // If the pathFinder failed it did not reach the last node
                 // Recursively try to find the point again from the new position
