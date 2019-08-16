@@ -1,28 +1,39 @@
 package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
+import java.util.Optional;
+
 public class PutInContainer extends OneArgFunction {
-    /**
-     * @param arg1 The integer slot id
-     * @return Whether or not the stack was placed into the chest
-     */
     @Override
     public LuaValue call(LuaValue arg1) {
-        int slot = Math.max(0, arg1.checkint());
+        int slot = arg1.checkint();
+
+        if (slot < 0) {
+            return LuaConstants.FALSE;
+        }
+
         // Shift click into the container
+        Optional<Container> container = Optional.ofNullable(NavigatorProvider.getPlayer().openContainer);
+
+        if (!container.isPresent()) {
+            return LuaConstants.FALSE;
+        }
+
         NavigatorProvider.getMinecraft().playerController.windowClick(
-                0,
+                container.get().windowId,
                 slot,
                 0,
                 ClickType.QUICK_MOVE,
                 NavigatorProvider.getPlayer());
 
-        // If it was put, then the slot is now empty
-        return LuaValue.valueOf(NavigatorProvider.getPlayer().inventory.getStackInSlot(slot) == ItemStack.EMPTY);
+        return LuaConstants.TRUE;
     }
 }
