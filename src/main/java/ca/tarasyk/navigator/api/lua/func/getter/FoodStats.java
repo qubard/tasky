@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua.func.getters;
+package ca.tarasyk.navigator.api.lua.func.getter;
 
 import ca.tarasyk.navigator.NavigatorProvider;
 import org.luaj.vm2.LuaValue;

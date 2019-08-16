@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua.func;
+package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
@@ -62,7 +62,7 @@ public class MoveTo extends ThreeArgFunction {
                     return LuaValue.valueOf(!pathFinder.hasFailed());
                 }
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                return LuaConstants.FALSE;
             }
         } else {
             // Traverse direction and splice
@@ -130,7 +130,7 @@ public class MoveTo extends ThreeArgFunction {
                 // We need a way of checking pathRunner failing
                 return CoerceJavaToLua.coerce(call(arg1, arg2, arg3));
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                return LuaConstants.FALSE;
             }
         }
 

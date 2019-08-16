@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua.func;
+package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.NavigatorProvider;
 import org.luaj.vm2.LuaValue;
@@ -11,7 +11,7 @@ public class CloseGUI extends OneArgFunction {
      */
     @Override
     public LuaValue call(LuaValue arg) {
-        long waitTimeMs = arg.checklong();
+        long waitTimeMs = Math.max(0, arg.checklong());
         long start = System.currentTimeMillis();
         while (NavigatorProvider.getMinecraft().currentScreen == null && (System.currentTimeMillis() - start < waitTimeMs)) { }
         NavigatorProvider.getPlayer().closeScreen();

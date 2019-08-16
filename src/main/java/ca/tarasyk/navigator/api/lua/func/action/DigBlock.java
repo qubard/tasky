@@ -1,14 +1,11 @@
-package ca.tarasyk.navigator.api.lua.func;
+package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
 import ca.tarasyk.navigator.pathfinding.movement.Move;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
-
-import java.security.Key;
 
 public class DigBlock extends ThreeArgFunction {
     @Override
@@ -29,7 +26,6 @@ public class DigBlock extends ThreeArgFunction {
         }
 
         PlayerUtil.lookAtXYZ(pos);
-
         PlayerUtil.attack(true);
 
         while (Move.isStrictlySolid(pos)) {

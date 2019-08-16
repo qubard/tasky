@@ -19,10 +19,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.Logger;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaError;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.*;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.IOException;
@@ -76,15 +73,18 @@ public class NavigatorMod
                     Globals globals = JsePlatform.standardGlobals();
                     globals.load(new HookLib());
                     LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
-                    chunk.call();
                     printDebugMessage("Successfully loaded test.lua!");
+                    chunk.call();
                 } catch (LuaError | IOException err) {
                     HookProvider.getProvider().unhook();
                     String errMsg = err.toString().replace("\n", "").replace("\r", "");
                     printDebugMessage("Failed to load: " + errMsg);
                 }
             });
-        } else {
+        } else if (e.getMessage().equals("-stop")) {
+             LuaExecutor.get().cancelActiveLoop();
+             HookProvider.getProvider().unhook();
+         } else {
              LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
         }
     }

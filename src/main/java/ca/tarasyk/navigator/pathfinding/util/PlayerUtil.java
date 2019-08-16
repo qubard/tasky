@@ -1,9 +1,7 @@
 package ca.tarasyk.navigator.pathfinding.util;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
-import ca.tarasyk.navigator.api.lua.LuaConstants;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;

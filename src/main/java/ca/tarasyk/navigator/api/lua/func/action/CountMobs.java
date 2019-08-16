@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.api.lua.func;
+package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;

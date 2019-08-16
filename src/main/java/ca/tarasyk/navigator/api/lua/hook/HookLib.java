@@ -1,10 +1,7 @@
 package ca.tarasyk.navigator.api.lua.hook;
 
-import ca.tarasyk.navigator.api.lua.func.*;
-import ca.tarasyk.navigator.api.lua.func.getters.CurrentSlot;
-import ca.tarasyk.navigator.api.lua.func.getters.ExperienceLevel;
-import ca.tarasyk.navigator.api.lua.func.getters.FoodStats;
-import ca.tarasyk.navigator.api.lua.func.getters.SlotDurability;
+import ca.tarasyk.navigator.api.lua.func.action.*;
+import ca.tarasyk.navigator.api.lua.func.getter.*;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
@@ -18,6 +15,8 @@ public class HookLib extends TwoArgFunction {
         env.set("hook", table);
         env.set("attack", new LeftClick());
         env.set("setSlot", new SetSlot());
+        env.set("findSlot", new FindSlot());
+        env.set("moveStack", new MoveStack(750));
         env.set("consumeItem", new ConsumeItem());
         env.set("drop", new Drop());
         env.set("sleep", new Sleep());
@@ -31,7 +30,7 @@ public class HookLib extends TwoArgFunction {
         env.set("foodStats", new FoodStats());
         env.set("digBlock", new DigBlock());
         env.set("countMobs", new CountMobs());
-        env.set("putInChest", new PutInChest());
+        env.set("putInContainer", new PutInContainer());
         env.set("printChat", new PrintChat());
         env.set("currentSlot", new CurrentSlot());
         env.set("moveTo", new MoveTo(30));
