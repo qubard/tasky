@@ -3,6 +3,7 @@ package ca.tarasyk.navigator.api.lua.func.action;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
+import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
@@ -45,26 +46,7 @@ public class MoveStack extends TwoArgFunction {
             return LuaConstants.FALSE;
         }
 
-        NavigatorProvider.getMinecraft().playerController.windowClick(
-                container.get().windowId,
-                slotSrc,
-                0,
-                ClickType.PICKUP,
-                NavigatorProvider.getPlayer());
-
-        // We need to wait before dropping, cause otherwise it happened too fast
-        try {
-            Thread.sleep(waitDelayMs);
-        } catch (InterruptedException e) {
-            return LuaConstants.FALSE;
-        }
-
-        NavigatorProvider.getMinecraft().playerController.windowClick(
-                container.get().windowId,
-                slotDest,
-                0,
-                ClickType.PICKUP,
-                NavigatorProvider.getPlayer());
+        PlayerUtil.moveStack(container.get(), slotSrc, slotDest, waitDelayMs);
 
         return LuaConstants.TRUE;
     }

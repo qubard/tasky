@@ -2,11 +2,15 @@ package ca.tarasyk.navigator.pathfinding.util;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Optional;
 
 public class PlayerUtil {
     public static void lookAtXZ(BetterBlockPos pos) {
@@ -84,5 +88,42 @@ public class PlayerUtil {
 
     public static void attack(boolean state) {
         KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindAttack.getKeyCode(), state);
+    }
+
+    public static int getCurrentSlot() {
+        return NavigatorProvider.getPlayer().inventory.currentItem;
+    }
+
+    public static void moveStack(Container container, int src, int dest, int waitDelayMs) {
+        NavigatorProvider.getMinecraft().playerController.windowClick(
+                container.windowId,
+                src,
+                0,
+                ClickType.PICKUP,
+                NavigatorProvider.getPlayer());
+
+        // We need to wait before dropping, otherwise it happened too fast
+        try {
+            Thread.sleep(waitDelayMs);
+        } catch (InterruptedException e) {}
+
+        NavigatorProvider.getMinecraft().playerController.windowClick(
+                container.windowId,
+                dest,
+                0,
+                ClickType.PICKUP,
+                NavigatorProvider.getPlayer());
+
+        try {
+            Thread.sleep(waitDelayMs);
+        } catch (InterruptedException e) {}
+        // Put the other item back
+
+        NavigatorProvider.getMinecraft().playerController.windowClick(
+                container.windowId,
+                src,
+                0,
+                ClickType.PICKUP,
+                NavigatorProvider.getPlayer());
     }
 }
