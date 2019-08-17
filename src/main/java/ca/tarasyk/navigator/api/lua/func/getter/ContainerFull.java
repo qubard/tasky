@@ -17,7 +17,7 @@ public class ContainerFull extends ZeroArgFunction {
         for (ItemStack stk : inventory) {
             if (stk.getItem().equals(Items.AIR)) {
                 return LuaConstants.FALSE;
-            }
+        }
         }
         return LuaConstants.TRUE;
     }

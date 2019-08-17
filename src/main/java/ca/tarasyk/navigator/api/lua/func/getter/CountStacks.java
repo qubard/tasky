@@ -18,6 +18,6 @@ public class CountStacks extends OneArgFunction {
                 totalSize += stk.getCount();
             }
         }
-        return LuaValue.valueOf(totalSize)
+        return LuaValue.valueOf(totalSize);
     }
 }
