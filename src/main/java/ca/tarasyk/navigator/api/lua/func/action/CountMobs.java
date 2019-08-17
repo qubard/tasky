@@ -17,6 +17,10 @@ public class CountMobs extends ThreeArgFunction {
         int y = (int) Math.floor(arg2.checkdouble());
         int z = (int) Math.floor(arg3.checkdouble());
 
+        if (!NavigatorProvider.getWorld().getChunkFromChunkCoords(x >> 4, z >> 4).isLoaded()) {
+            return LuaValue.valueOf(-1);
+        }
+
         BetterBlockPos pos = new BetterBlockPos(x, y, z);
         List<Entity> loadedEnts = NavigatorProvider.getWorld().getLoadedEntityList();
         int count = loadedEnts.stream().mapToInt(ent -> ent instanceof EntityMob && PlayerUtil.entityAtXYZ(ent, pos) ? 1 : 0).sum();

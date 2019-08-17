@@ -2,36 +2,23 @@ package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
-import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 
 import java.util.Optional;
 
-public class PutInContainer extends OneArgFunction {
+public class EnchantItem extends OneArgFunction {
     @Override
-    public LuaValue call(LuaValue arg1) {
-        int slot = arg1.checkint();
-
-        if (slot < 0) {
-            return LuaConstants.FALSE;
-        }
-
-        // Shift click into the container
+    public LuaValue call(LuaValue arg) {
+        int button = arg.checkint() % 3;
         Optional<Container> container = Optional.ofNullable(NavigatorProvider.getPlayer().openContainer);
 
         if (!container.isPresent()) {
             return LuaConstants.FALSE;
         }
 
-        NavigatorProvider.getMinecraft().playerController.windowClick(
-                container.get().windowId,
-                slot,
-                0,
-                ClickType.QUICK_MOVE,
-                NavigatorProvider.getPlayer());
-
+        NavigatorProvider.getMinecraft().playerController.sendEnchantPacket(container.get().windowId, button);
         return LuaConstants.TRUE;
     }
 }

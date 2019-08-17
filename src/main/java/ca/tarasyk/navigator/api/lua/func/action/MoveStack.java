@@ -3,6 +3,7 @@ package ca.tarasyk.navigator.api.lua.func.action;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -40,7 +41,7 @@ public class MoveStack extends TwoArgFunction {
         ItemStack dstStk = inventory.get(slotDest);
 
         // Can't move to a slot already taken, or src already empty
-        if (srcStk.toString().contains("tile.air") || !dstStk.toString().contains("tile.air")) {
+        if (srcStk.getItem().equals(Items.AIR) || !dstStk.getItem().equals(Items.AIR) ) {
             return LuaConstants.FALSE;
         }
 

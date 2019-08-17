@@ -10,12 +10,15 @@ public class HookLib extends TwoArgFunction {
     public LuaValue call(LuaValue modname, LuaValue env) {
         LuaValue root = tableOf();
         LuaValue table = tableOf();
+        env.set("hook", table);
+        env.set("inventoryFull", new InventoryFull());
+        env.set("containerFull", new ContainerFull());
         table.set("add", new HookAdd());
         env.set("setLoop", new SetLoop());
-        env.set("hook", table);
         env.set("attack", new LeftClick());
+        env.set("enchantItem", new EnchantItem());
         env.set("setSlot", new SetSlot());
-        env.set("findSlot", new FindSlot());
+        env.set("findSlots", new FindSlot());
         env.set("moveStack", new MoveStack(750));
         env.set("consumeItem", new ConsumeItem());
         env.set("drop", new Drop());
@@ -28,6 +31,10 @@ public class HookLib extends TwoArgFunction {
         env.set("closeGUI", new CloseGUI());
         env.set("expLevel", new ExperienceLevel());
         env.set("dropStack", new DropStack());
+        env.set("blockAt", new BlockAt());
+        env.set("allBlocks", new AllBlocks());
+        env.set("harvestLevel", new HarvestLevel());
+        env.set("cropLevel", new CropLevel());
         env.set("foodStats", new FoodStats());
         env.set("digBlock", new DigBlock());
         env.set("countMobs", new CountMobs());
@@ -36,7 +43,7 @@ public class HookLib extends TwoArgFunction {
         env.set("currentSlot", new CurrentSlot());
         env.set("moveTo", new MoveTo(30));
         env.set("moveToXZ", new MoveToXZ());
-        env.set("rightClickBlock", new RightClickBlock());
+        env.set("rightClickBlock", new RightClickBlock(100));
         return root;
     }
 

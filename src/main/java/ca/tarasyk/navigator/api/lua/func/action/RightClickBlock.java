@@ -14,6 +14,14 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 
 public class RightClickBlock extends ThreeArgFunction {
+
+    // The time to wait after right clicking the block
+    private int waitTimeMs;
+
+    public RightClickBlock(int waitTimeMs) {
+        this.waitTimeMs = waitTimeMs;
+    }
+
     /**
      * @param arg1 The x-coordinate
      * @param arg2 The y-coordinate
@@ -36,6 +44,11 @@ public class RightClickBlock extends ThreeArgFunction {
         PlayerUtil.lookAtXYZ(x, y, z);
         EnumActionResult result = NavigatorProvider.getMinecraft().playerController.processRightClickBlock(player, world,
                 new BlockPos(x, y, z), EnumFacing.DOWN, player.getLookVec(), EnumHand.MAIN_HAND);
+
+        try {
+            Thread.sleep(waitTimeMs);
+        } catch (InterruptedException e) {}
+
         return LuaValue.valueOf(result == EnumActionResult.SUCCESS);
     }
 }

@@ -18,6 +18,6 @@ public class ItemStack extends OneArgFunction {
             return null;
         }
 
-        return CoerceJavaToLua.coerce(container.get().getInventory().get(slot).getItem());
+        return CoerceJavaToLua.coerce(container.get().getInventory().get(slot));
     }
 }

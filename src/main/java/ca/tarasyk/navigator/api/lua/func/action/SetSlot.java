@@ -8,8 +8,8 @@ public class SetSlot extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue arg) {
         int slot = arg.checkint();
-        if (slot >= 0 && slot < 9) {
-            NavigatorProvider.getPlayer().inventory.currentItem = slot;
+        if (slot >= 36 && slot < 44) {
+            NavigatorProvider.getPlayer().inventory.currentItem = slot - 36;
         }
         return null;
     }
