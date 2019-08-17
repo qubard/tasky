@@ -9,6 +9,7 @@ public class LeftClick extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue arg) {
         long holdTimeMs = Math.max(0, arg.checklong());
+        KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindAttack.getKeyCode(), true);
         try {
             Thread.sleep(holdTimeMs);
         } catch (InterruptedException e) {}

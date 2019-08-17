@@ -43,7 +43,7 @@ public class RightClickBlock extends ThreeArgFunction {
         WorldClient world = NavigatorProvider.getWorld();
         PlayerUtil.lookAtXYZ(x, y, z);
         EnumActionResult result = NavigatorProvider.getMinecraft().playerController.processRightClickBlock(player, world,
-                new BlockPos(x, y, z), EnumFacing.DOWN, player.getLookVec(), EnumHand.MAIN_HAND);
+                new BlockPos(x, y, z), EnumFacing.UP, player.getLookVec(), EnumHand.MAIN_HAND);
 
         try {
             Thread.sleep(waitTimeMs);

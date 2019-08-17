@@ -39,7 +39,8 @@ public class PathRunner implements Runnable {
 
                 // Does the player have to jump up? (the target node is a block above), or in water
                 PlayerUtil.moveForward();
-                PlayerUtil.jump((targetNode.getY() - (int)p.posY >= 1) || NavigatorProvider.getPlayer().isInWater());
+                // We make sure the check is double because this messes up on crops, so we need to be exact
+                PlayerUtil.jump(((double)targetNode.getY() - p.posY >= 1.0) || NavigatorProvider.getPlayer().isInWater());
 
                 if ((nextIndex >= 0 && nextIndex > currIndex)){
                     currIndex = nextIndex;

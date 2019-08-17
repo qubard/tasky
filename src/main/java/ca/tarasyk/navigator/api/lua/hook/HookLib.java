@@ -15,10 +15,12 @@ public class HookLib extends TwoArgFunction {
         env.set("containerFull", new ContainerFull());
         table.set("add", new HookAdd());
         env.set("setLoop", new SetLoop());
+        env.set("player", new Player());
         env.set("attack", new LeftClick());
+        env.set("countStacks", new CountStacks());
         env.set("enchantItem", new EnchantItem());
         env.set("setSlot", new SetSlot());
-        env.set("findSlots", new FindSlot());
+        env.set("findSlots", new FindSlots());
         env.set("moveStack", new MoveStack(750));
         env.set("consumeItem", new ConsumeItem());
         env.set("drop", new Drop());
@@ -32,11 +34,12 @@ public class HookLib extends TwoArgFunction {
         env.set("expLevel", new ExperienceLevel());
         env.set("dropStack", new DropStack());
         env.set("blockAt", new BlockAt());
-        env.set("allBlocks", new AllBlocks());
         env.set("harvestLevel", new HarvestLevel());
         env.set("cropLevel", new CropLevel());
         env.set("foodStats", new FoodStats());
         env.set("digBlock", new DigBlock());
+        env.set("rightClick", new RightClick());
+        env.set("clickBlock", new ClickBlock());
         env.set("countMobs", new CountMobs());
         env.set("putInContainer", new PutInContainer());
         env.set("printChat", new PrintChat());

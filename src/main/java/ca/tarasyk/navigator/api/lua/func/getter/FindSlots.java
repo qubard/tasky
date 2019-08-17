@@ -9,7 +9,7 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.util.ArrayList;
 
-public class FindSlot extends OneArgFunction {
+public class FindSlots extends OneArgFunction {
     /**
      * @param arg The searched for item stack's name
      * @return A list of integers containing each matched slot
