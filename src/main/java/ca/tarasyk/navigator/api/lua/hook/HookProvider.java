@@ -52,7 +52,7 @@ public class HookProvider {
                     }
                 }
             } catch(LuaError e) {
-                // In the event that a LuaError is thrown simply unhook, and let the player know the error
+                // In the event that a LuaError is thrown simply unhook, and let the player know
                 NavigatorMod.printDebugMessage("Lua error! " + e.getMessage().toString().replace("\n", "").replace("\r", ""));
                 this.unhook();
                 return false;

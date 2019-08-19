@@ -56,8 +56,9 @@ public class MoveTo extends ThreeArgFunction {
                 if (!pathFinder.hasFailed()) {
                     NavigatorMod.path = potentialPath.get();
                     PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
-                    Future f = LuaExecutor.get().submit(pathRunner);
-                    f.get();
+                    Future pathRanFuture = LuaExecutor.get().submit(pathRunner);
+                    pathRanFuture.get(); // Wait for pathRunner to finish executing
+                    NavigatorMod.path = null;
                     // If the pathFinder failed it did not reach the last node
                     return LuaValue.valueOf(!pathFinder.hasFailed());
                 }

@@ -1,5 +1,6 @@
 package ca.tarasyk.navigator;
 
+import ca.tarasyk.navigator.api.lua.InterruptLib;
 import ca.tarasyk.navigator.api.lua.LuaExecutor;
 import ca.tarasyk.navigator.api.lua.hook.Hook;
 import ca.tarasyk.navigator.api.lua.hook.HookLib;
@@ -20,7 +21,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.*;
+import org.luaj.vm2.compiler.LuaC;
+import org.luaj.vm2.lib.Bit32Lib;
+import org.luaj.vm2.lib.PackageLib;
+import org.luaj.vm2.lib.StringLib;
+import org.luaj.vm2.lib.TableLib;
+import org.luaj.vm2.lib.jse.JseBaseLib;
+import org.luaj.vm2.lib.jse.JseMathLib;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import org.luaj.vm2.lib.jse.LuajavaLib;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -61,36 +70,72 @@ public class NavigatorMod
 
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent e) {
-        LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
+        if (LuaExecutor.get().getExecutor().isPresent()) {
+            LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
+        }
     }
+
+    InterruptLib it = new InterruptLib();
 
     @SubscribeEvent
     public void onChat(ServerChatEvent e) {
          if (e.getMessage().equals("-load")) {
              LuaExecutor.get().submit(() -> {
-                try {
-                    HookProvider.getProvider().unhook();
-                    Globals globals = JsePlatform.standardGlobals();
-                    globals.load(new HookLib());
-                    LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
-                    printDebugMessage("Successfully loaded test.lua!");
-                    chunk.call();
-                } catch (LuaError | IOException err) {
-                    HookProvider.getProvider().unhook();
-                    String errMsg = err.toString().replace("\n", "").replace("\r", "");
-                    printDebugMessage("Failed to load: " + errMsg);
-                }
-            });
+                 try {
+                     HookProvider.getProvider().unhook();
+
+                     // Setup globals
+                     Globals globals = new Globals();
+                     globals.load(new JseBaseLib());
+                     globals.load(new PackageLib());
+                     globals.load(new Bit32Lib());
+                     globals.load(new TableLib());
+                     globals.load(new StringLib());
+                     globals.load(new JseMathLib());
+                     globals.load(new LuajavaLib());
+                     globals.load(new HookLib());
+                     globals.load(it);
+                     LoadState.install(globals);
+                     LuaC.install(globals);
+
+                     LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
+                     printDebugMessage("Successfully loaded test.lua!");
+                     chunk.call();
+                     printDebugMessage("Finished loading.");
+                 } catch (LuaError err) {
+                     HookProvider.getProvider().unhook();
+                     String errMsg = err.toString().replace("\n", "").replace("\r", "");
+                     printDebugMessage(errMsg);
+                 } catch (IOException err) {
+                    printDebugMessage("Chunk interrupted");
+                 }
+             });
         } else if (e.getMessage().equals("-stop")) {
+             it.setInterrupted(true);
              LuaExecutor.get().cancelActiveLoop();
+             LuaExecutor.get().getExecutor().get().shutdownNow();
+             try {
+                 LuaExecutor.get().getExecutor().get().awaitTermination(10000, TimeUnit.MILLISECONDS);
+             } catch (InterruptedException ex) {
+                 ex.printStackTrace();
+             }
+             it.setInterrupted(false);
+             printDebugMessage("Closed successfully");
              HookProvider.getProvider().unhook();
+             LuaExecutor.get().newExecutor();
          } else {
-             LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
+             try {
+                 if (LuaExecutor.get().getExecutor().isPresent()) {
+                     LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
+                 }
+             } catch (Exception ee) {
+                 ee.printStackTrace();
+             }
         }
     }
 
     public static void printDebugMessage(String msg) {
-        String str = "\247d[Tasky] \2477" + msg;
+        String str = "\247b[Tasky] \2477" + msg;
         NavigatorProvider.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(str));
     }
 

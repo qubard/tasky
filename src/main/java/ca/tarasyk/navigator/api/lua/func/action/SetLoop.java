@@ -12,7 +12,7 @@ public class SetLoop extends TwoArgFunction {
         long delayMs = Math.max(0, arg2.checklong());
         LuaExecutor.get().cancelActiveLoop();
         LuaExecutor.get().setLoopFuture(LuaExecutor.get().submit(() -> {
-            while (LuaExecutor.get().isLoopActive() && func.call().checkboolean()) {
+            while (!Thread.currentThread().isInterrupted() && func.call().checkboolean()) {
                 try {
                     Thread.sleep(delayMs);
                 } catch (InterruptedException e) {

@@ -29,7 +29,7 @@ public class PathRunner implements Runnable {
         int currIndex = path.nextClosest(0);
         long elapsedMoveTime = 0; // So we don't get stuck at a node (a little bit unpreventable)
 
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             if (currIndex + 1 < nodes.size()) {
                 BetterBlockPos targetNode = path.getNode(currIndex + 1);
 
