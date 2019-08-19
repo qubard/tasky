@@ -56,6 +56,7 @@ public class MoveTo extends ThreeArgFunction {
                 if (!pathFinder.hasFailed()) {
                     NavigatorMod.path = potentialPath.get();
                     PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
+                    // TODO: Use a dedicated pathRunner executor for this
                     Future pathRanFuture = LuaExecutor.get().submit(pathRunner);
                     pathRanFuture.get(); // Wait for pathRunner to finish executing
                     NavigatorMod.path = null;

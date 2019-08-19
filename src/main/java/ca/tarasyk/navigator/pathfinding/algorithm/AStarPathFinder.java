@@ -24,12 +24,7 @@ public class AStarPathFinder extends PathFinder {
     }
 
     public Optional<BlockPosPath> search(PathNode src, Goal goal) {
-        // We can speed up finding alternative paths to other locations
-        // by just re-using openSet and closedSet (the heuristics will be inaccurate tho)
-        // wait, no it won't, because it'll still be going in the same direction
-        // And checking closedSet for the node on more attempts
         Long start = System.currentTimeMillis();
-
         PathNode curr = null;
 
         if (closedSet.isEmpty()) {

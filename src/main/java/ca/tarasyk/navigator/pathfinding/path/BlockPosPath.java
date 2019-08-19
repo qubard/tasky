@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 public class BlockPosPath extends Path<BetterBlockPos> {
 
     public BlockPosPath(Path<BetterBlockPos> path) {
+        super(path.reversed);
         nodes = path.getNodes();
     }
 
@@ -41,11 +42,11 @@ public class BlockPosPath extends Path<BetterBlockPos> {
      * @return The path nodes near `pos` at distance `range`
      */
     public Path<BetterBlockPos> pathNear(double range, BetterBlockPos pos) {
-        Path<BetterBlockPos> newPath = new Path<>();
+        Path<BetterBlockPos> newPath = new Path<>(reversed);
         for (BetterBlockPos node : nodes) {
             double d = Heuristic.EUCLIDEAN_DISTANCE_2D.apply(node, pos);
             if (d <= range) {
-                newPath.addNode(node);
+                newPath.pushNode(node);
             }
         }
         return newPath;

@@ -6,17 +6,22 @@ import java.util.List;
 public class Path<T> {
 
     protected List<T> nodes = new ArrayList<T>();
+    protected boolean reversed;
+
+    public Path(boolean reversed) {
+        this.reversed = reversed;
+    }
 
     /**
-     * @param node Add a node to the path
+     * @param node Push a node to the path
      */
-    public void addNode(T node) {
+    public void pushNode(T node) {
         this.nodes.add(node);
     }
 
     public T getNode(int i) {
         if (i < 0) i = 0;
-        return this.nodes.get(this.nodes.size() - i - 1);
+        return this.nodes.get(reversed ? this.nodes.size() - i - 1 : i);
     }
 
     public List<T> getNodes() {

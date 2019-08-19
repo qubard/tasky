@@ -34,11 +34,11 @@ public class Node<S, D> implements IPathable<D> {
     @Override
     public Path<D> pathFrom() {
         Node<S, D> curr = this;
-        Path<D> path = new Path<>();
+        Path<D> path = new Path<>(true);
         while (curr != null) {
             Optional<D> data = curr.getData();
             if (data.isPresent()) {
-                path.addNode(curr.getData().get());
+                path.pushNode(curr.getData().get());
             }
             curr = curr.getParent().orElse(null);
         }
