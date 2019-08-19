@@ -42,7 +42,7 @@ public class BlockPosPath extends Path<BetterBlockPos> {
      * @return The path nodes near `pos` at distance `range`
      */
     public Path<BetterBlockPos> pathNear(double range, BetterBlockPos pos) {
-        Path<BetterBlockPos> newPath = new Path<>(reversed);
+        Path<BetterBlockPos> newPath = new Path<>(false);
         for (BetterBlockPos node : nodes) {
             double d = Heuristic.EUCLIDEAN_DISTANCE_2D.apply(node, pos);
             if (d <= range) {

@@ -57,7 +57,7 @@ public enum Move {
      */
     public static boolean isSolid(WorldClient ctx, BlockPos pos) {
         Block block = ctx.getBlockState(pos).getBlock();
-        return !block.isPassable(ctx, pos) || (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA || block == Blocks.FLOWING_WATER || block == Blocks.LEAVES || block == Blocks.LEAVES2);
+        return !block.isPassable(ctx, pos) || (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA || block == Blocks.LEAVES || block == Blocks.LEAVES2);
     }
 
     public static boolean isWater(WorldClient ctx, BlockPos pos) {
@@ -143,17 +143,21 @@ public enum Move {
         double totalCost = Heuristic.REALLY_FAST_HEURISTIC_XZ.apply(src.getPos(), dest.getPos());
 
         // Trying to climb but not pillaring straight up, increases search space complexity
-        if (!isSolid(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos().down()) || (isWater(ctx, dest.getPos().down()) && isWater(ctx, dest.getPos().up()))) {
+        if ((!isSolid(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos().down()))) {
             // Nothing to stand on, or unloaded chunk, dest block is solid (can't jump on it), or we have to dig to get to the block
             return Optional.ofNullable(null);
         }
 
-        // Avoids the weird case where the node path is above the water
-        if (!isSolid(ctx, dest.getPos()) && isWater(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos())) {
+        if (isWater(ctx, dest.getPos().down()) && isWater(ctx, dest.getPos()) && isWater(ctx, dest.getPos().up())) {
             return Optional.ofNullable(null);
         }
 
-        if (isSolid(ctx, dest.getPos()) || !isSolid(ctx, dest.getPos().down())) {
+        // Our destination node
+        if (!isSolid(ctx, dest.getPos()) && (!isWater(ctx, dest.getPos().down()) && !isSolid(ctx, dest.getPos().down()))) {
+            return Optional.ofNullable(null);
+        }
+
+        if (isSolid(ctx, dest.getPos()) || (!isSolid(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos()))) {
             return Optional.ofNullable(null);
         }
 
