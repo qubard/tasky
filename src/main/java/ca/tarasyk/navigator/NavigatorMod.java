@@ -13,12 +13,14 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.*;
 import org.luaj.vm2.compiler.LuaC;
@@ -28,7 +30,6 @@ import org.luaj.vm2.lib.StringLib;
 import org.luaj.vm2.lib.TableLib;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
-import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.lib.jse.LuajavaLib;
 
 import java.io.IOException;
@@ -39,8 +40,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -71,7 +70,14 @@ public class NavigatorMod
     @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent e) {
         if (LuaExecutor.get().getExecutor().isPresent()) {
-            LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_LIVING_HURT, e));
+            LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.LIVING_HURT, e));
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlaySoundEvent(PlaySoundAtEntityEvent e) {
+        if (LuaExecutor.get().getExecutor().isPresent()) {
+            LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.PLAY_SOUND_AT_ENTITY, e));
         }
     }
 
@@ -126,7 +132,7 @@ public class NavigatorMod
          } else {
              try {
                  if (LuaExecutor.get().getExecutor().isPresent()) {
-                     LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.ON_CHAT, e));
+                     LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.CHAT, e));
                  }
              } catch (Exception ee) {
                  ee.printStackTrace();

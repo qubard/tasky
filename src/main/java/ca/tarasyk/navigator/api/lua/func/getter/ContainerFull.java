@@ -13,11 +13,11 @@ public class ContainerFull extends ZeroArgFunction {
     @Override
     public LuaValue call() {
         Container container = NavigatorProvider.getPlayer().openContainer;
-        NonNullList<net.minecraft.item.ItemStack> inventory = NavigatorProvider.getPlayer().openContainer.getInventory();
+        NonNullList<net.minecraft.item.ItemStack> inventory = container.getInventory();
         for (ItemStack stk : inventory) {
             if (stk.getItem().equals(Items.AIR)) {
                 return LuaConstants.FALSE;
-        }
+            }
         }
         return LuaConstants.TRUE;
     }

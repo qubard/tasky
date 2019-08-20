@@ -12,6 +12,12 @@ public class BlockAt extends ThreeArgFunction {
         int x = (int) Math.floor(arg1.checkdouble());
         int y = (int) Math.floor(arg2.checkdouble());
         int z = (int) Math.floor(arg3.checkdouble());
+        boolean isLoaded = NavigatorProvider.getWorld().getChunkFromChunkCoords(x >> 4, z >> 4).isLoaded();
+
+        if (!isLoaded) {
+            return null;
+        }
+
         return CoerceJavaToLua.coerce(NavigatorProvider.getWorld().getBlockState(new BlockPos(x, y, z)).getBlock());
     }
 }

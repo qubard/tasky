@@ -1,6 +1,7 @@
 package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.NavigatorProvider;
+import ca.tarasyk.navigator.api.lua.LuaConstants;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +18,8 @@ public class AttackMouseover extends ZeroArgFunction {
         if (ent != null) {
             controller.attackEntity(player, ent);
             player.swingArm(EnumHand.MAIN_HAND);
+            return LuaConstants.TRUE;
         }
-        return null;
+        return LuaConstants.FALSE;
     }
 }

@@ -30,13 +30,13 @@ public class HookLib extends TwoArgFunction {
         env.set("itemStack", new ItemStack());
         env.set("leftClick", new LeftClick());
         env.set("inventoryHas", new InventoryHas());
-        env.set("slotDurability", new SlotDurability());
+        env.set("maxDurability", new MaxSlotDurability());
+        env.set("durability", new SlotDurability());
         env.set("closeGUI", new CloseGUI());
         env.set("expLevel", new ExperienceLevel());
-        env.set("dropStack", new DropStack());
         env.set("blockAt", new BlockAt());
         env.set("harvestLevel", new HarvestLevel());
-        env.set("cropLevel", new CropLevel());
+        env.set("cropAge", new CropAge());
         env.set("foodStats", new FoodStats());
         env.set("digBlock", new DigBlock());
         env.set("rightClick", new RightClick());

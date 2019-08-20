@@ -2,12 +2,14 @@ package ca.tarasyk.navigator.api.lua.func.action;
 
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-public class Drop extends ZeroArgFunction {
+public class Drop extends OneArgFunction {
     @Override
-    public LuaValue call() {
-        PlayerUtil.dropHeld(false);
+    public LuaValue call(LuaValue arg1) {
+        boolean all = arg1.checkboolean();
+        PlayerUtil.dropHeld(all);
         return null;
     }
 }

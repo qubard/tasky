@@ -8,7 +8,7 @@ import org.luaj.vm2.lib.OneArgFunction;
 public class ConsumeItem extends OneArgFunction {
     @Override
     public LuaValue call(LuaValue arg1) {
-        int holdTimeMs = Math.max(0, arg1.checkint());
+        long holdTimeMs = Math.max(0, arg1.checklong());
         KeyBinding.setKeyBindState(NavigatorProvider.getMinecraft().gameSettings.keyBindUseItem.getKeyCode(), true);
         try {
             Thread.sleep(holdTimeMs);

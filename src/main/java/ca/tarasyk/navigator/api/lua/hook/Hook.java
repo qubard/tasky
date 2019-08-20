@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum Hook {
-    ON_CHAT("onChat"),
-    ON_LIVING_HURT("onLivingHurt");
+    CHAT("onChat"),
+    LIVING_HURT("onLivingHurt"),
+    PLAY_SOUND_AT_ENTITY("onPlaySoundAtEntity");
 
     private final String hookName;
 

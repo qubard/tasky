@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 
-public class CropLevel extends ThreeArgFunction {
+public class CropAge extends ThreeArgFunction {
     @Override
     public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
         int x = (int) Math.floor(arg1.checkdouble());
