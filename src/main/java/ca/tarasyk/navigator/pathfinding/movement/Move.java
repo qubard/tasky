@@ -50,6 +50,12 @@ public enum Move {
         return new PathNode(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
     }
 
+    public static boolean isOccluded(BetterBlockPos pos) {
+        return isStrictlySolid(pos.north()) && isStrictlySolid(pos.south()) &&
+                isStrictlySolid(pos.east()) && isStrictlySolid(pos.west())
+                && isStrictlySolid(pos.up()) && isStrictlySolid(pos.down());
+    }
+
     /**
      * @param ctx The in-game World
      * @param pos The position
@@ -63,6 +69,12 @@ public enum Move {
     public static boolean isWater(WorldClient ctx, BlockPos pos) {
         Block block = ctx.getBlockState(pos).getBlock();
         return block == Blocks.FLOWING_WATER || block == Blocks.WATER;
+    }
+
+    public static boolean isAir(BlockPos pos) {
+        WorldClient ctx = NavigatorProvider.getWorld();
+        Block block = ctx.getBlockState(pos).getBlock();
+        return block == Blocks.AIR;
     }
 
     public static boolean isLava(WorldClient ctx, BlockPos pos) {

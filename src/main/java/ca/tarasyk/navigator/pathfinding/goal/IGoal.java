@@ -4,7 +4,7 @@ import ca.tarasyk.navigator.BetterBlockPos;
 
 public interface IGoal {
     /**
-     * @param node The node we're checking against
+     * @param pos The position we're checking against
      * @return Whether or not node meets the goal criteria
      */
     default boolean metGoal(BetterBlockPos pos) {

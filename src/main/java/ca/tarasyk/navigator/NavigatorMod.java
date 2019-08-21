@@ -74,13 +74,6 @@ public class NavigatorMod
         }
     }
 
-    @SubscribeEvent
-    public void onPlaySoundEvent(PlaySoundAtEntityEvent e) {
-        if (LuaExecutor.get().getExecutor().isPresent()) {
-            LuaExecutor.get().submit(() -> HookProvider.getProvider().dispatch(Hook.PLAY_SOUND_AT_ENTITY, e));
-        }
-    }
-
     InterruptLib it = new InterruptLib();
 
     @SubscribeEvent

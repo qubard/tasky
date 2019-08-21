@@ -22,6 +22,34 @@ public class PlayerUtil {
         p.rotationPitch = 0f;
     }
 
+    public static float yawFrom(BetterBlockPos src, BetterBlockPos dest) {
+        EntityPlayer p = NavigatorProvider.getPlayer();
+        double dx = src.getX() - dest.getX();
+        double dz = src.getZ() - dest.getZ();
+        float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
+        return yaw;
+    }
+
+    public static float yawFrom(double x, double z, BetterBlockPos dest, int dx1, int dz1) {
+        EntityPlayer p = NavigatorProvider.getPlayer();
+        double dx = x - dest.getX() - 0.5 - 0.5 * Integer.compare(dx1, 0);
+        double dz = z - dest.getZ() - 0.5 - 0.5 * Integer.compare(dz1, 0);
+        float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
+        return yaw;
+    }
+
+    public static void lookAtXZ(BetterBlockPos pos, float maxYawDelta) {
+        EntityPlayer p = NavigatorProvider.getPlayer();
+        double dx = p.posX - (pos.getX() + 0.5);
+        double dz = p.posZ - (pos.getZ() + 0.5);
+        float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
+        float delta = Math.abs(yaw - p.rotationYaw);
+        if (delta <= maxYawDelta) {
+            p.rotationYaw = yaw;
+        }
+        p.rotationPitch = 0f;
+    }
+
     public static void lookAtXZ(int x, int z) {
         lookAtXZ(new BetterBlockPos(x, z));
     }
@@ -55,7 +83,7 @@ public class PlayerUtil {
     public static boolean canReach(int x, int y, int z) {
         EntityPlayer player = NavigatorProvider.getPlayer();
         float reach = NavigatorProvider.getMinecraft().playerController.getBlockReachDistance();
-        return Math.sqrt(player.getDistanceSqToCenter(new BlockPos(x, y, z))) < reach;
+        return Math.sqrt(player.getDistanceSqToCenter(new BlockPos(x, y, z))) <= reach;
     }
 
     /**

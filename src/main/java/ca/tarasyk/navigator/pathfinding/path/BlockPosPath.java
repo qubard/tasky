@@ -4,6 +4,7 @@ import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.algorithm.Heuristic;
+import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.function.BiFunction;
@@ -34,6 +35,31 @@ public class BlockPosPath extends Path<BetterBlockPos> {
             }
         }
         return minIndex;
+    }
+
+
+    /**
+     * @param index The node's index
+     * @return The yaw rotation (direction vector) for the node in the path
+     */
+    public float computeYawForNode(int index, float def) {
+        if (nodes.size() == 1) {
+            return def;
+        }
+
+        if (index < 0) {
+            return computeYawForNode(0, def);
+        }
+
+        if (index >= nodes.size() - 1) {
+            return computeYawForNode(nodes.size() - 2, def);
+        }
+
+        EntityPlayer player = NavigatorProvider.getPlayer();
+        BetterBlockPos curr = getNode(index);
+        BetterBlockPos next = getNode(index + 1);
+        return PlayerUtil.yawFrom(player.posX, player.posZ, next,
+                next.getX() - curr.getX(), next.getZ() - curr.getZ());
     }
 
     /**

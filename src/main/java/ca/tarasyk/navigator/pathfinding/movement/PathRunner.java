@@ -1,6 +1,7 @@
 package ca.tarasyk.navigator.pathfinding.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
+import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.goal.Goal;
@@ -19,6 +20,12 @@ public class PathRunner implements Runnable {
 
     private void runAlongPath() {
         List<BetterBlockPos> nodes = path.getNodes();
+
+        // No nodes to run along
+        if (nodes.isEmpty()) {
+            return;
+        }
+
         EntityPlayer player = NavigatorProvider.getPlayer();
 
         int currIndex = path.nextClosest(0);
@@ -28,7 +35,10 @@ public class PathRunner implements Runnable {
             if (currIndex + 1 < nodes.size()) {
                 BetterBlockPos targetNode = path.getNode(currIndex + 1);
 
-                PlayerUtil.lookAtXZ(targetNode);
+                if (!PlayerUtil.playerAt(targetNode)) {
+                    player.rotationYaw = path.computeYawForNode(currIndex, player.rotationYaw);
+                }
+                player.rotationPitch = 0;
 
                 int nextIndex = path.nextClosest(currIndex);
 
@@ -45,12 +55,6 @@ public class PathRunner implements Runnable {
                 }
             } else {
                 BetterBlockPos node = path.getNode(nodes.size() - 1);
-                double dx = player.posX - (node.getX() + 0.5);
-                double dz = player.posZ - (node.getZ() + 0.5);
-                float yaw = (float) (Math.atan2(dx, dz) * 180f / Math.PI);
-
-                yaw = 180 - yaw;
-                player.rotationYaw = yaw;
 
                 if (PlayerUtil.playerAt(node)) {
                     PlayerUtil.stopMovingForward();
