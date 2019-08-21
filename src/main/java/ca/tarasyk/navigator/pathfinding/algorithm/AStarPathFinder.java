@@ -14,28 +14,19 @@ import java.util.*;
 public class AStarPathFinder extends PathFinder {
 
     private Long timeoutMs;
-    private Queue<PathNode> openSet;
-    private Set<PathNode> closedSet;
 
     public AStarPathFinder(Long timeoutMs) {
         this.timeoutMs = timeoutMs;
-        openSet = new PriorityQueue<>(new PathNodeCompare());
-        closedSet =  new HashSet<>();
     }
 
     public Optional<BlockPosPath> search(PathNode src, Goal goal) {
         Long start = System.currentTimeMillis();
-        PathNode curr = null;
+        Queue<PathNode> openSet = new PriorityQueue<>(new PathNodeCompare());
+        Set<PathNode> closedSet =  new HashSet<>();
 
-        if (closedSet.isEmpty()) {
-            src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src.getPos())));
-            openSet.add(src);
-            curr = src;
-        } else if (closedSet.contains(goal.toPathNode())) {
-            PathNode dest = new PathNode(goal.getPos());
-            NavigatorMod.printDebugMessage("Found in closedSet");
-            return Optional.of(new BlockPosPath(dest.pathFrom()));
-        }
+        PathNode curr = src;
+        src.setScore(new AStarScore().setGScore(0.0).setFScore(goal.heuristic(src.getPos())));
+        openSet.add(src);
 
         setFailed(false);
 
@@ -73,13 +64,11 @@ public class AStarPathFinder extends PathFinder {
                     double neighborGScore = neighbor.getScore().get().getGScore();
                     double newGScore = curr.getScore().get().getGScore() + cost.get(); // curr always defined
 
-                    if (!openSet.contains(neighbor)) {
-                        openSet.add(neighbor);
-                    }
-
                     if (newGScore < neighborGScore) {
                         neighbor.setParent(curr);
                         neighbor.setScore(new AStarScore().setGScore(newGScore).setFScore(newGScore + goal.heuristic(neighbor.getPos())));
+                        openSet.add(neighbor);
+                    } else if (!openSet.contains(neighbor)) {
                         openSet.add(neighbor);
                     }
                 }
@@ -87,7 +76,7 @@ public class AStarPathFinder extends PathFinder {
         }
 
         setFailed(true);
-        NavigatorMod.printDebugMessage(closedSet.size() + " movements considered, but no path existed");
+        NavigatorMod.printDebugMessage(closedSet.size() + " movements considered, but no path existed" + ", length:" + new BlockPosPath(curr.pathFrom()).getNodes().size());
         return Optional.of(new BlockPosPath(curr.pathFrom()));
     }
 }

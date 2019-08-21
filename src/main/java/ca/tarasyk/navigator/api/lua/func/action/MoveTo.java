@@ -11,6 +11,7 @@ import ca.tarasyk.navigator.pathfinding.goal.Goal;
 import ca.tarasyk.navigator.pathfinding.goal.GoalXZ;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
+import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
@@ -43,7 +44,8 @@ public class MoveTo extends ThreeArgFunction {
         int y = (int) Math.floor(arg2.checkdouble());
         int z = (int) Math.floor(arg3.checkdouble());
         EntityPlayer player = NavigatorProvider.getMinecraft().player;
-        BetterBlockPos playerPos = new BetterBlockPos(player.getPosition());
+        BetterBlockPos playerPos = PlayerUtil.inWaterReplacement(new BetterBlockPos(player.getPosition()));
+        // Ensure playerpos is not in water
         Goal goal = new GoalXZ(x, z);
         boolean isLoaded = NavigatorProvider.getWorld().getChunkFromChunkCoords(x >> 4, z >> 4).isLoaded();
         NavigatorMod.printDebugMessage("Chunk loaded:" + isLoaded);
@@ -100,7 +102,7 @@ public class MoveTo extends ThreeArgFunction {
                     int tx = possibleX + ox + rx;
                     int tz = possibleZ + oz + rz;
                     NavigatorMod.printDebugMessage("Trying " + tx + "," + tz);
-                    AStarPathFinder finalPathFinder = new AStarPathFinder((long) 2000);
+                    AStarPathFinder finalPathFinder = new AStarPathFinder((long) 5000);
                     future = LuaExecutor.get().submit(() -> finalPathFinder.search(new PathNode(playerPos), new GoalXZ(tx, tz)));
                     potentialPath = future.get();
                     if (!finalPathFinder.hasFailed()) {

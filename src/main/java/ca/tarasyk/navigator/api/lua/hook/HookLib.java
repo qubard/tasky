@@ -45,7 +45,7 @@ public class HookLib extends TwoArgFunction {
         env.set("putInContainer", new PutInContainer());
         env.set("printChat", new PrintChat());
         env.set("currentSlot", new CurrentSlot());
-        env.set("moveTo", new MoveTo(30));
+        env.set("moveTo", new MoveTo(100));
         env.set("moveToXZ", new MoveToXZ());
         env.set("rightClickBlock", new RightClickBlock(100));
         return root;

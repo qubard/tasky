@@ -71,6 +71,10 @@ public enum Move {
         return block == Blocks.FLOWING_WATER || block == Blocks.WATER;
     }
 
+    public static boolean isWater(BlockPos pos) {
+        return isWater(NavigatorProvider.getWorld(), pos);
+    }
+
     public static boolean isAir(BlockPos pos) {
         WorldClient ctx = NavigatorProvider.getWorld();
         Block block = ctx.getBlockState(pos).getBlock();

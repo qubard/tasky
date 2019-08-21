@@ -3,6 +3,7 @@ package ca.tarasyk.navigator.pathfinding.util;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
+import ca.tarasyk.navigator.pathfinding.movement.Move;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -36,6 +37,17 @@ public class PlayerUtil {
         double dz = z - dest.getZ() - 0.5 - 0.5 * Integer.compare(dz1, 0);
         float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
         return yaw;
+    }
+
+    /**
+     * @param pos The position that might be in water
+     * @return If it's in water, return the surface position
+     */
+    public static BetterBlockPos inWaterReplacement(BetterBlockPos pos) {
+        if (Move.isWater(pos.up()) && Move.isWater(pos) && Move.isWater(pos.down())) {
+            return new BetterBlockPos(NavigatorProvider.getWorld().getTopSolidOrLiquidBlock(pos));
+        }
+        return pos;
     }
 
     public static void lookAtXZ(BetterBlockPos pos, float maxYawDelta) {

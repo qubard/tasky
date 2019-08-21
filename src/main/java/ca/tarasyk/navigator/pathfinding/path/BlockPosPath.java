@@ -25,12 +25,12 @@ public class BlockPosPath extends Path<BetterBlockPos> {
         for (int i = start; i < Math.min(start + 3, nodes.size()); i++) {
             BetterBlockPos node = getNode(i);
             EntityPlayer p = NavigatorProvider.getPlayer();
-            double a = p.posX < 0 ? Math.ceil(p.posX) : Math.floor(p.posX);
-            double b = p.posZ < 0 ? Math.ceil(p.posZ) : Math.floor(p.posZ);
-            double c = node.getX() + 0.5 < 0 ? Math.ceil(node.getX()+ 0.5 ) : Math.floor(node.getX()+ 0.5 );
-            double d = node.getZ() + 0.5 < 0 ? Math.ceil(node.getZ()+ 0.5 ) : Math.floor(node.getZ()+ 0.5 );
+            double x1 = p.posX < 0 ? Math.ceil(p.posX) : Math.floor(p.posX);
+            double z1 = p.posZ < 0 ? Math.ceil(p.posZ) : Math.floor(p.posZ);
+            double x2 = node.getX() + 0.5 < 0 ? Math.ceil(node.getX() + 0.5) : Math.floor(node.getX() + 0.5);
+            double z2 = node.getZ() + 0.5 < 0 ? Math.ceil(node.getZ() + 0.5) : Math.floor(node.getZ() + 0.5);
 
-            if (a == c && b == d) {
+            if (x1 == x2 && z1 == z2) {
                 return i;
             }
         }
