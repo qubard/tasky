@@ -13,9 +13,11 @@ import java.util.List;
 public class PathRunner implements Runnable {
 
     private final BlockPosPath path;
+    private final long timePerNode;
 
-    public PathRunner(BlockPosPath path, Goal goal) {
+    public PathRunner(BlockPosPath path, Goal goal, long timePerNode) {
         this.path = path;
+        this.timePerNode = timePerNode;
     }
 
     private void runAlongPath() {
@@ -50,7 +52,7 @@ public class PathRunner implements Runnable {
                 if ((nextIndex >= 0 && nextIndex > currIndex)){
                     currIndex = nextIndex;
                     elapsedMoveTime = System.currentTimeMillis();
-                } else if (PlayerUtil.playerAt(targetNode) && (System.currentTimeMillis() - elapsedMoveTime) >= 300) {
+                } else if (PlayerUtil.playerAt(targetNode) && (System.currentTimeMillis() - elapsedMoveTime) >= timePerNode) {
                     currIndex++;
                 }
             } else {

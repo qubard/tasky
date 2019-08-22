@@ -156,7 +156,7 @@ public enum Move {
             return Optional.ofNullable(null);
         }
 
-        double totalCost = Heuristic.REALLY_FAST_HEURISTIC_XZ.apply(src.getPos(), dest.getPos());
+        double totalCost = Heuristic.REALLY_FAST_HEURISTIC.apply(src.getPos(), dest.getPos());
 
         // Trying to climb but not pillaring straight up, increases search space complexity
         if ((!isSolid(ctx, dest.getPos().down()) && !isWater(ctx, dest.getPos().down()))) {

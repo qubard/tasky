@@ -16,12 +16,12 @@ public class FindSlots extends OneArgFunction {
      */
     @Override
     public LuaValue call(LuaValue arg) {
-        String searchName = arg.checkjstring();
+        String searchTerm = arg.checkjstring();
         NonNullList<ItemStack> stacks = NavigatorProvider.getPlayer().openContainer.getInventory();
         ArrayList<Integer> slots = new ArrayList<>();
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack stk = stacks.get(i);
-            if (stk.getDisplayName().equals(searchName)) {
+            if (stk.getDisplayName().matches(searchTerm)) {
                 slots.add(i);
             }
         }

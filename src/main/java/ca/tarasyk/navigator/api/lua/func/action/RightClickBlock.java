@@ -16,7 +16,7 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 public class RightClickBlock extends ThreeArgFunction {
 
     // The time to wait after right clicking the block
-    private int waitTimeMs;
+    private final int waitTimeMs;
 
     public RightClickBlock(int waitTimeMs) {
         this.waitTimeMs = waitTimeMs;

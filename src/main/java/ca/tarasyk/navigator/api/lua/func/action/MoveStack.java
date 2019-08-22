@@ -1,11 +1,9 @@
 package ca.tarasyk.navigator.api.lua.func.action;
 
-import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.api.lua.LuaConstants;
 import ca.tarasyk.navigator.pathfinding.util.PlayerUtil;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -16,7 +14,7 @@ import java.util.Optional;
 
 public class MoveStack extends TwoArgFunction {
 
-    private int waitDelayMs;
+    private final int waitDelayMs;
 
     public MoveStack(int waitDelayMs) {
         this.waitDelayMs = waitDelayMs;

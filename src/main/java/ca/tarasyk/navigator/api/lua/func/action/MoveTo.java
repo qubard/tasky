@@ -45,7 +45,7 @@ public class MoveTo extends ThreeArgFunction {
         int z = (int) Math.floor(arg3.checkdouble());
         EntityPlayer player = NavigatorProvider.getMinecraft().player;
         BetterBlockPos playerPos = PlayerUtil.inWaterReplacement(new BetterBlockPos(player.getPosition()));
-        // Ensure playerpos is not in water
+        // Ensure playerPos is not in water
         Goal goal = new GoalXZ(x, z);
         boolean isLoaded = NavigatorProvider.getWorld().getChunkFromChunkCoords(x >> 4, z >> 4).isLoaded();
         NavigatorMod.printDebugMessage("Chunk loaded:" + isLoaded);
@@ -57,7 +57,7 @@ public class MoveTo extends ThreeArgFunction {
                 Optional<BlockPosPath> potentialPath = future.get();
                 if (!pathFinder.hasFailed()) {
                     NavigatorMod.path = potentialPath.get();
-                    PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
+                    PathRunner pathRunner = new PathRunner(potentialPath.get(), goal, 300);
                     // TODO: Use a dedicated pathRunner executor for this
                     Future pathRanFuture = LuaExecutor.get().submit(pathRunner);
                     pathRanFuture.get(); // Wait for pathRunner to finish executing
@@ -126,7 +126,7 @@ public class MoveTo extends ThreeArgFunction {
                 }
 
                 NavigatorMod.path = potentialPath.get();
-                PathRunner pathRunner = new PathRunner(potentialPath.get(), goal);
+                PathRunner pathRunner = new PathRunner(potentialPath.get(), goal, 300);
                 Future f = LuaExecutor.get().submit(pathRunner);
                 f.get();
                 // If the pathFinder failed it did not reach the last node

@@ -17,6 +17,7 @@ public class HookLib extends TwoArgFunction {
         env.set("setLoop", new SetLoop());
         env.set("player", new Player());
         env.set("attack", new LeftClick());
+        env.set("chunkLoaded", new ChunkLoaded());
         env.set("countStacks", new CountStacks());
         env.set("enchantItem", new EnchantItem());
         env.set("setSlot", new SetSlot());

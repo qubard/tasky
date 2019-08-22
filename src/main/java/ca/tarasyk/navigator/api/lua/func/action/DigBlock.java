@@ -9,7 +9,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ThreeArgFunction;
 
 public class DigBlock extends ThreeArgFunction {
-    private long timeoutMs;
+    private final long timeoutMs;
 
     public DigBlock(long timeoutMs) {
         this.timeoutMs = timeoutMs;
