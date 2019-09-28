@@ -39,8 +39,8 @@ public class PathRunner implements Runnable {
 
                 if (!PlayerUtil.playerAt(targetNode)) {
                     player.rotationYaw = path.computeYawForNode(currIndex, player.rotationYaw);
+                    player.rotationPitch = 0;
                 }
-                player.rotationPitch = 0;
 
                 int nextIndex = path.nextClosest(currIndex);
 
