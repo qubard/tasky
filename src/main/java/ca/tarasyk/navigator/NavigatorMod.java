@@ -8,6 +8,7 @@ import ca.tarasyk.navigator.api.lua.hook.HookProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -15,6 +16,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -31,6 +33,7 @@ import org.luaj.vm2.lib.TableLib;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
 import org.luaj.vm2.lib.jse.LuajavaLib;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -59,12 +62,20 @@ public class NavigatorMod
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        register();
         logger = event.getModLog();
     }
 
     private void renderParticlesAtBlock(float x, float y, float z) {
         Random rand = new Random();
         NavigatorProvider.getWorld().spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x + 0.5, y + 0.5, z + 0.5, rand.nextGaussian() * 0.01f + - 0.01f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.01 - 0.01/2);
+    }
+
+    public static KeyBinding test;
+
+    public static void register() {
+        test = new KeyBinding("hello", Keyboard.KEY_V, "Open Tasky");
+        ClientRegistry.registerKeyBinding(test);
     }
 
     @SubscribeEvent

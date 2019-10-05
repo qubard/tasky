@@ -2,7 +2,7 @@ package ca.tarasyk.navigator.pathfinding.goal;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 
-public interface IGoal {
+public interface PathGoal {
     /**
      * @param pos The position we're checking against
      * @return Whether or not node meets the goal criteria

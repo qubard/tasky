@@ -1,6 +1,6 @@
 package ca.tarasyk.navigator.pathfinding.algorithm.score;
 
-public class AStarScore implements IScore<AStarScore> {
+public class AStarScore implements Score<AStarScore> {
 
     private Double fScore;
     private Double gScore;

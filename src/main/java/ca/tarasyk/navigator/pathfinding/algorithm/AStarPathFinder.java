@@ -11,12 +11,21 @@ import ca.tarasyk.navigator.pathfinding.node.PathNodeCompare;
 
 import java.util.*;
 
-public class AStarPathFinder extends PathFinder {
+public class AStarPathFinder implements PathFinder {
 
     private Long timeoutMs;
+    private boolean hasFailed;
 
     public AStarPathFinder(Long timeoutMs) {
         this.timeoutMs = timeoutMs;
+    }
+
+    public boolean hasFailed() {
+        return this.hasFailed;
+    }
+
+    private void setFailed(boolean failed) {
+        this.hasFailed = failed;
     }
 
     public Optional<BlockPosPath> search(PathNode src, Goal goal) {

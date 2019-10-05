@@ -3,7 +3,7 @@ package ca.tarasyk.navigator.pathfinding.goal;
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
 
-public abstract class Goal implements IGoal {
+public abstract class Goal implements PathGoal {
     protected BetterBlockPos pos;
 
     public Goal(BetterBlockPos pos) {

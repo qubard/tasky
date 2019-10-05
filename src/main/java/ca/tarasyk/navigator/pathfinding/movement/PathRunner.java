@@ -1,7 +1,6 @@
 package ca.tarasyk.navigator.pathfinding.movement;
 
 import ca.tarasyk.navigator.BetterBlockPos;
-import ca.tarasyk.navigator.NavigatorMod;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.goal.Goal;

@@ -1,11 +1,11 @@
 package ca.tarasyk.navigator.pathfinding.node;
 
 import ca.tarasyk.navigator.pathfinding.path.Path;
-import ca.tarasyk.navigator.pathfinding.path.IPathable;
+import ca.tarasyk.navigator.pathfinding.path.Pathable;
 
 import java.util.Optional;
 
-public class Node<S, D> implements IPathable<D> {
+public class Node<S, D> implements Pathable<D> {
 
     private Optional<Node<S, D>> parent = Optional.ofNullable(null);
     private Optional<S> score = Optional.ofNullable(null);

@@ -6,17 +6,6 @@ import ca.tarasyk.navigator.pathfinding.node.PathNode;
 
 import java.util.Optional;
 
-abstract class PathFinder {
-
-    protected boolean failed;
-
-    abstract Optional<BlockPosPath> search(PathNode src, Goal goal);
-
-    public boolean hasFailed() {
-        return failed;
-    }
-
-    public void setFailed(boolean state) {
-        this.failed = state;
-    }
+public interface PathFinder {
+    Optional<BlockPosPath> search(PathNode src, Goal goal);
 }

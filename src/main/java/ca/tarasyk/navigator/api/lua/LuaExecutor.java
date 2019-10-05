@@ -8,14 +8,14 @@ import java.util.concurrent.Future;
 
 public class LuaExecutor {
 
-    private int nThreads;
+    private int threadCount;
     private Optional<ExecutorService> executor;
     private static LuaExecutor singleton = new LuaExecutor(LuaConstants.THREAD_COUNT);
     private Optional<Future> loopFuture = Optional.ofNullable(null);
 
-    public LuaExecutor(int nThreads) {
-        this.nThreads = nThreads;
-        this.executor = Optional.of(Executors.newFixedThreadPool(nThreads));
+    public LuaExecutor(int threadCount) {
+        this.threadCount = threadCount;
+        this.executor = Optional.of(Executors.newFixedThreadPool(threadCount));
     }
 
     public void setLoopFuture(Future loopFuture) {
@@ -30,7 +30,7 @@ public class LuaExecutor {
     }
 
     public void newExecutor() {
-        executor = Optional.of(Executors.newFixedThreadPool(nThreads));
+        executor = Optional.of(Executors.newFixedThreadPool(threadCount));
     }
 
     public static LuaExecutor get() {
