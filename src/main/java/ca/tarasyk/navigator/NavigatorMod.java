@@ -5,24 +5,23 @@ import ca.tarasyk.navigator.api.lua.LuaExecutor;
 import ca.tarasyk.navigator.api.lua.hook.Hook;
 import ca.tarasyk.navigator.api.lua.hook.HookLib;
 import ca.tarasyk.navigator.api.lua.hook.HookProvider;
+import ca.tarasyk.navigator.keybind.KeyCommand;
+import ca.tarasyk.navigator.keybind.KeyRegister;
+import ca.tarasyk.navigator.keybind.commands.OpenEditor;
 import ca.tarasyk.navigator.pathfinding.path.BlockPosPath;
 import ca.tarasyk.navigator.pathfinding.node.PathNode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.apache.logging.log4j.Logger;
 import org.luaj.vm2.*;
 import org.luaj.vm2.compiler.LuaC;
@@ -36,22 +35,20 @@ import org.luaj.vm2.lib.jse.LuajavaLib;
 import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-@Mod(modid="navigator", name="Navigator", version="1.0")
+@Mod(modid= "assets/navigator", name="Navigator", version="1.0")
 public class NavigatorMod
 {
     private static Logger logger;
 
     private int nTicks = 0;
+
+    static KeyRegister register = new KeyRegister();
 
     // this is all very temporary and dumb still
     PathNode start = new PathNode(23, 4, -9);
@@ -71,11 +68,16 @@ public class NavigatorMod
         NavigatorProvider.getWorld().spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, x + 0.5, y + 0.5, z + 0.5, rand.nextGaussian() * 0.01f + - 0.01f/2, rand.nextGaussian() * 0.03f - 0.03/2, rand.nextGaussian() * 0.01 - 0.01/2);
     }
 
-    public static KeyBinding test;
+    public static KeyCommand test;
 
     public static void register() {
-        test = new KeyBinding("hello", Keyboard.KEY_V, "Open Tasky");
-        ClientRegistry.registerKeyBinding(test);
+        test = new OpenEditor("Open Tasky", Keyboard.KEY_V, "Open Tasky Editor");
+        register.addCommand(test);
+    }
+
+    @SubscribeEvent
+    public void onKeyEvent(InputEvent.KeyInputEvent e) {
+        register.onKeyEvent(e);
     }
 
     @SubscribeEvent
@@ -108,7 +110,7 @@ public class NavigatorMod
                      LoadState.install(globals);
                      LuaC.install(globals);
 
-                     LuaValue chunk = globals.load(loadScript("tasky", "test.lua"));
+                     LuaValue chunk = globals.load(ScriptHelper.loadScript("tasky", "test.lua"));
                      printDebugMessage("Successfully loaded test.lua!");
                      chunk.call();
                      printDebugMessage("Finished loading.");
@@ -117,7 +119,7 @@ public class NavigatorMod
                      String errMsg = err.toString().replace("\n", "").replace("\r", "");
                      printDebugMessage(errMsg);
                  } catch (IOException err) {
-                    printDebugMessage("Chunk interrupted");
+                    printDebugMessage(err.getMessage());
                  }
              });
         } else if (e.getMessage().equals("-stop")) {
@@ -149,17 +151,6 @@ public class NavigatorMod
         NavigatorProvider.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(str));
     }
 
-    static String readFile(String path, Charset encoding)
-            throws IOException
-    {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
-    }
-
-    public static String loadScript(String root, String name) throws IOException {
-        String path = new StringBuilder().append(Minecraft.getMinecraft().mcDataDir.getPath()).append("/").append(root).append("/scripts/").append(name).toString();
-        return readFile(path, StandardCharsets.UTF_8);
-    }
 
     ArrayList<Integer> tickList = new ArrayList<>();
 
