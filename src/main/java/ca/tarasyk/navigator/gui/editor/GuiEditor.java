@@ -6,10 +6,10 @@ import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.IOException;
-import java.security.Key;
 
 public class GuiEditor extends GuiScreen {
 
@@ -18,9 +18,14 @@ public class GuiEditor extends GuiScreen {
     private String[] fileLines;
 
     /**
-     * The line number of the top (first) row
+     * The line number of the first visible row
      */
-    private int currLineTop = 0;
+    private int currLine = 0;
+
+    /**
+     * The left-most current visible column
+     */
+    private int currColumn = 0;
 
     /**
      * The maximum number of rendered lines
@@ -33,6 +38,15 @@ public class GuiEditor extends GuiScreen {
     private int cursorRow = 0;
     private int cursorColumn = 0;
     private int lineHeight;
+
+    private final int BACKGROUND = 0xF8F8F2;
+    private final int FOREGROUND = 0x7C7F6C;
+    private final int HIGHLIGHT = 0xFF48493E;
+
+    private final int EDITOR_WIDTH_PX = 160;
+    private final int GLYPH_WIDTH = 16;
+
+    private final int CHARACTERS_PER_LINE = 28;
 
     public GuiEditor(String scriptName, int lineHeight) {
         try {
@@ -48,22 +62,48 @@ public class GuiEditor extends GuiScreen {
         super.keyTyped(typedChar, keyCode);
         if (keyCode == 205) {
             cursorColumn++;
+
+            // If the line ends here, go to the next one
+            if (cursorRow != fileLines.length - 1 && cursorColumn > fileLines[cursorRow].length()) {
+                cursorRow++;
+                cursorColumn = 0;
+                currColumn = 0;
+            } else if (cursorColumn + currColumn < fileLines[cursorRow].length() && cursorColumn >= currColumn + CHARACTERS_PER_LINE) {
+                currColumn++;
+            }
         } else if (keyCode == 203) {
+            // Bind the cursor column before iterating
+            cursorColumn = boundCursorColumn();
             cursorColumn--;
+
+            if (cursorColumn < 0) {
+                cursorRow--;
+                //cursorColumn = end of previous line (updates window too)
+            } else if (cursorColumn < currColumn) {
+                currColumn--;
+            }
         } else if (keyCode == 200) {
             cursorRow--;
         } else if (keyCode == 208) {
             cursorRow++;
         }
 
+        cursorColumn = Math.max(0, cursorColumn);
         cursorRow = Math.min(Math.max(cursorRow, 0), fileLines.length - 1);
-        cursorColumn = Math.max(0, Math.min(fileLines[cursorRow].length(), cursorColumn));
 
-        if (cursorRow >= currLineTop + MAX_LINES) {
-            currLineTop++;
-        } else if (cursorRow < currLineTop) {
-            currLineTop--;
+        if (cursorRow >= currLine + MAX_LINES) {
+            currLine++;
+        } else if (cursorRow < currLine) {
+            currLine--;
         }
+    }
+
+    /**
+     * Bind cursorColumn to not exceed the length of the current line
+     * @return cursorColumn at most the length of the current line
+     */
+    private int boundCursorColumn() {
+        return Math.min(fileLines[cursorRow].length(), cursorColumn);
     }
 
     private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber) {
@@ -76,14 +116,12 @@ public class GuiEditor extends GuiScreen {
         }
 
         // Draw line number
-        fontRenderer.drawString(builder.toString(), x + 9, y,0x7C7F6C,false);
-
-        FontRenderer fontRenderer = NavigatorProvider.getMinecraft().fontRenderer;
-        fontRenderer.drawString(fontRenderer.trimStringToWidth(str,160 - lineNumberWidth), x + lineNumberWidth + 14, y, 0xF8F8F2,false);
+        fontRenderer.drawString(builder.toString(), x + 9, y, FOREGROUND,false);
+        fontRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND,false);
     }
 
     private int maxLineNumberWidth() {
-        return Minecraft.getMinecraft().fontRenderer.getStringWidth(String.valueOf(currLineTop + MAX_LINES));
+        return Minecraft.getMinecraft().fontRenderer.getStringWidth(String.valueOf(currLine + MAX_LINES));
     }
 
     private void drawHighlight(int x, int y, int color) {
@@ -99,18 +137,28 @@ public class GuiEditor extends GuiScreen {
         super.drawTexturedModalRect(topLeftX, topLeftY, 1, 1, 192, 174);
 
         for (int line = 0; line < MAX_LINES && line < fileLines.length; line++) {
-            // Highlight the current row, line + currLineTop is the line in global space, line is non-normalized
-            if (line + currLineTop == cursorRow) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, 0xFF48493E);
+            // Highlight the current row, line + currLine is the line in global space, line is non-normalized
+            if (line + currLine == cursorRow) {
+                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT);
             }
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
-            drawTextLine(line + 1 + currLineTop, fileLines[currLineTop + line], topLeftX + 4, topLeftY + line * lineHeight + 12, lineNumberWidth, String.valueOf(currLineTop + MAX_LINES).length());
 
-            if (line + currLineTop == cursorRow) {
+           String codeLine = fileLines[currLine + line];
+            if (currColumn < codeLine.length()) {
+                drawTextLine(
+                        line + 1 + currLine,
+                        codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + CHARACTERS_PER_LINE)),
+                        topLeftX + 4,
+                        topLeftY + line * lineHeight + 12,
+                        lineNumberWidth,
+                        String.valueOf(currLine + MAX_LINES).length());
+            }
+
+            if (line + currLine == cursorRow) {
                 // Draw the cursor
                 // offset from cursorcolumn has to be calculated based on line width up to cursor column
-                int lineOffset = NavigatorProvider.getMinecraft().fontRenderer.getStringWidth(fileLines[cursorRow].substring(0, cursorColumn));
+                int lineOffset = NavigatorProvider.getMinecraft().fontRenderer.getStringWidth(fileLines[cursorRow].substring(0, boundCursorColumn()));
                 drawRect(topLeftX + lineOffset + lineNumberWidth + 17, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 18 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }
