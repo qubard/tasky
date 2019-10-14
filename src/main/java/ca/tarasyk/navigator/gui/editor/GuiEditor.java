@@ -43,10 +43,7 @@ public class GuiEditor extends GuiScreen {
     private final int FOREGROUND = 0x7C7F6C;
     private final int HIGHLIGHT = 0xFF48493E;
 
-    private final int EDITOR_WIDTH_PX = 160;
-    private final int GLYPH_WIDTH = 16;
-
-    private final int CHARACTERS_PER_LINE = 28;
+    private final int VISIBLE_LINE_CHAR_WIDTH = 29;
 
     public GuiEditor(String scriptName, int lineHeight) {
         try {
@@ -68,7 +65,7 @@ public class GuiEditor extends GuiScreen {
                 cursorRow++;
                 cursorColumn = 0;
                 currColumn = 0;
-            } else if (cursorColumn + currColumn < fileLines[cursorRow].length() && cursorColumn >= currColumn + CHARACTERS_PER_LINE) {
+            } else if (currColumn < fileLines[currLine].length() && cursorColumn > currColumn + VISIBLE_LINE_CHAR_WIDTH) {
                 currColumn++;
             }
         } else if (keyCode == 203) {
@@ -120,6 +117,10 @@ public class GuiEditor extends GuiScreen {
         fontRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND,false);
     }
 
+
+    /**
+     * @return The maximum width of visible line numbers
+     */
     private int maxLineNumberWidth() {
         return Minecraft.getMinecraft().fontRenderer.getStringWidth(String.valueOf(currLine + MAX_LINES));
     }
@@ -141,24 +142,22 @@ public class GuiEditor extends GuiScreen {
             if (line + currLine == cursorRow) {
                 drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT);
             }
+
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
-
-           String codeLine = fileLines[currLine + line];
-            if (currColumn < codeLine.length()) {
-                drawTextLine(
-                        line + 1 + currLine,
-                        codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + CHARACTERS_PER_LINE)),
-                        topLeftX + 4,
-                        topLeftY + line * lineHeight + 12,
-                        lineNumberWidth,
-                        String.valueOf(currLine + MAX_LINES).length());
-            }
+            String codeLine = fileLines[currLine + line];
+            drawTextLine(
+                    line + 1 + currLine,
+                    currColumn < codeLine.length() ? codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + VISIBLE_LINE_CHAR_WIDTH)) : "",
+                    topLeftX + 4,
+                    topLeftY + line * lineHeight + 12,
+                    lineNumberWidth,
+                    String.valueOf(currLine + MAX_LINES).length());
 
             if (line + currLine == cursorRow) {
                 // Draw the cursor
                 // offset from cursorcolumn has to be calculated based on line width up to cursor column
-                int lineOffset = NavigatorProvider.getMinecraft().fontRenderer.getStringWidth(fileLines[cursorRow].substring(0, boundCursorColumn()));
+                int lineOffset = NavigatorProvider.getMinecraft().fontRenderer.getStringWidth(fileLines[cursorRow].substring(currColumn, boundCursorColumn()));
                 drawRect(topLeftX + lineOffset + lineNumberWidth + 17, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 18 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }
