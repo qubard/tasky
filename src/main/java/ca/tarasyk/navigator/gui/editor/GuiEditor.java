@@ -2,9 +2,7 @@ package ca.tarasyk.navigator.gui.editor;
 
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.ScriptHelper;
-import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -14,6 +12,7 @@ import java.io.IOException;
 public class GuiEditor extends GuiScreen {
 
     private static final ResourceLocation EDITOR = new ResourceLocation("navigator:editor.png");
+    private static final ResourceLocation EDITOR_FONT = new ResourceLocation("navigator:editor_font.png");
 
     private String[] fileLines;
 
@@ -37,10 +36,14 @@ public class GuiEditor extends GuiScreen {
      */
     private int cursorRow = 0;
     private int cursorColumn = 0;
+
+    /**
+     * The height (in pixels) of a line
+     */
     private int lineHeight;
 
-    private final int BACKGROUND = 0xF8F8F2;
-    private final int FOREGROUND = 0x7C7F6C;
+    private final int BACKGROUND = 0xFFF8F8F2;
+    private final int FOREGROUND = 0xFF7C7F6C;
     private final int HIGHLIGHT = 0xFF48493E;
 
     private final int VISIBLE_LINE_CHAR_WIDTH = 29;
@@ -113,29 +116,56 @@ public class GuiEditor extends GuiScreen {
         }
 
         // Draw line number
-        fontRenderer.drawString(builder.toString(), x + 9, y, FOREGROUND,false);
-        fontRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND,false);
+        drawString(builder.toString(), x + 9, y, FOREGROUND);
+        drawString(str, x + lineNumberWidth + 14, y, BACKGROUND);
     }
-
 
     /**
      * @return The maximum width of visible line numbers
      */
     private int maxLineNumberWidth() {
-        return Minecraft.getMinecraft().fontRenderer.getStringWidth(String.valueOf(currLine + MAX_LINES));
+        return String.valueOf(currLine + MAX_LINES).length() * 8;
     }
 
     private void drawHighlight(int x, int y, int color) {
         drawRect(x, y, x + 176, y + lineHeight, color);
     }
 
+    private void drawString(String str, int x, int y, int color) {
+        GlStateManager.pushMatrix();
+        Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR_FONT);
+        GlStateManager.scale(1.0f, 0.25f, 1.0f);
+
+        float red = color & 255;
+        float green = (color >> 8) & 255;
+        float blue = (color >> 16) & 255;
+        float alpha = (color >> 24) & 255;
+        GlStateManager.color(red, green, blue, alpha);
+
+        for (int i = 0; i < str.length(); i++) {
+            drawGlyph(str.charAt(i), x + i * 8, y);
+        }
+        GlStateManager.popMatrix();
+    }
+
+    private void drawGlyph(char ch, int x, int y) {
+        int textureX = 8 * (ch % 32);
+        int textureY = 32 * (ch / 32);
+        drawTexturedModalRect(x, y, textureX, textureY, 8, 32);
+    }
+
+    private void drawBackground(int x, int y) {
+        Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR);
+        drawTexturedModalRect(x, y, 1, 1, 192, 174);
+    }
+
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR);
+
         int topLeftX = (width - 192) / 2;
         int topLeftY = (height - 166) / 2;
 
-        super.drawTexturedModalRect(topLeftX, topLeftY, 1, 1, 192, 174);
+        drawBackground(topLeftX, topLeftY);
 
         for (int line = 0; line < MAX_LINES && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized

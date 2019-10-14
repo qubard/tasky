@@ -4,6 +4,7 @@
     <list default="true" id="6f7bbfdb-c55f-488c-a746-8e5adf17a7c6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/navigator.iws" beforeDir="false" afterPath="$PROJECT_DIR$/navigator.iws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ca/tarasyk/navigator/gui/editor/GuiEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ca/tarasyk/navigator/gui/editor/GuiEditor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ca/tarasyk/navigator/keybind/commands/OpenEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ca/tarasyk/navigator/keybind/commands/OpenEditor.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
