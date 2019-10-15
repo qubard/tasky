@@ -3,6 +3,7 @@ package ca.tarasyk.navigator.gui.editor;
 import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.ScriptHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -47,6 +48,8 @@ public class GuiEditor extends GuiScreen {
     private final int HIGHLIGHT = 0xFF48493E;
 
     private final int VISIBLE_LINE_CHAR_WIDTH = 29;
+
+    private FontRenderer monoRenderer = new FontRenderer();
 
     public GuiEditor(String scriptName, int lineHeight) {
         try {
@@ -134,7 +137,7 @@ public class GuiEditor extends GuiScreen {
     private void drawString(String str, int x, int y, int color) {
         GlStateManager.pushMatrix();
         Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR_FONT);
-        GlStateManager.scale(1.0f, 0.25f, 1.0f);
+        GlStateManager.scale(2.0f, 0.5f, 1.0f);
 
         float red = color & 255;
         float green = (color >> 8) & 255;
