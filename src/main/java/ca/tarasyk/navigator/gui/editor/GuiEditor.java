@@ -6,6 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.IOException;
@@ -47,15 +49,18 @@ public class GuiEditor extends GuiScreen {
     private final int FOREGROUND = 0xFF7C7F6C;
     private final int HIGHLIGHT = 0xFF48493E;
 
-    private final int VISIBLE_LINE_CHAR_WIDTH = 29;
+    private final int VISIBLE_LINE_CHAR_WIDTH = 19;
 
-    private FontRenderer monoRenderer = new FontRenderer();
+    private FontRenderer monoRenderer;
+    private TextureManager textureManager;
 
-    public GuiEditor(String scriptName, int lineHeight) {
+    public GuiEditor(String scriptName, int lineHeight, GameSettings gameSettings, TextureManager textureManager) {
         try {
             String fileBytes = ScriptHelper.loadScript("tasky", scriptName);
             fileLines = fileBytes.split("\\r?\\n");
             this.lineHeight = lineHeight;
+            this.textureManager = textureManager;
+            monoRenderer = new MonoFontRenderer(gameSettings, EDITOR_FONT, textureManager, true);
         } catch (IOException err) {
 
         }
@@ -110,24 +115,17 @@ public class GuiEditor extends GuiScreen {
     }
 
     private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber) {
-        // Build the line numbers
-        StringBuilder builder = new StringBuilder();
-        builder.append(lineNumber);
-        String lineNumberStr = String.valueOf(lineNumber);
-        for (int i = 0; i < maxCharLineNumber - lineNumberStr.length(); i++) {
-            builder.insert(0, ' ');
-        }
-
         // Draw line number
-        drawString(builder.toString(), x + 9, y, FOREGROUND);
-        drawString(str, x + lineNumberWidth + 14, y, BACKGROUND);
+        int l = String.valueOf(lineNumber).length();
+        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - l) * 8, y, FOREGROUND);
+        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND);
     }
 
     /**
      * @return The maximum width of visible line numbers
      */
     private int maxLineNumberWidth() {
-        return String.valueOf(currLine + MAX_LINES).length() * 8;
+        return monoRenderer.getStringWidth(String.valueOf(currLine + MAX_LINES));
     }
 
     private void drawHighlight(int x, int y, int color) {
@@ -136,7 +134,7 @@ public class GuiEditor extends GuiScreen {
 
     private void drawString(String str, int x, int y, int color) {
         GlStateManager.pushMatrix();
-        Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR_FONT);
+        textureManager.bindTexture(EDITOR_FONT);
         GlStateManager.scale(2.0f, 0.5f, 1.0f);
 
         float red = color & 255;
@@ -159,7 +157,7 @@ public class GuiEditor extends GuiScreen {
 
     private void drawBackground(int x, int y) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR);
-        drawTexturedModalRect(x, y, 1, 1, 192, 174);
+        drawTexturedModalRect(x, y, 0, 0, 192, 176);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -190,8 +188,9 @@ public class GuiEditor extends GuiScreen {
             if (line + currLine == cursorRow) {
                 // Draw the cursor
                 // offset from cursorcolumn has to be calculated based on line width up to cursor column
-                int lineOffset = NavigatorProvider.getMinecraft().fontRenderer.getStringWidth(fileLines[cursorRow].substring(currColumn, boundCursorColumn()));
-                drawRect(topLeftX + lineOffset + lineNumberWidth + 17, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 18 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
+                int lineOffset = fileLines[cursorRow].substring(currColumn, boundCursorColumn()).length() * 8;
+                System.out.println(fileLines[cursorRow].substring(currColumn, boundCursorColumn()).length());
+                drawRect(topLeftX + lineOffset + lineNumberWidth + 18, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }
     }

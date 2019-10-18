@@ -10,6 +10,6 @@ public class OpenEditor extends KeyCommand {
     }
 
     public void onPressed() {
-        NavigatorProvider.getMinecraft().displayGuiScreen(new GuiEditor("test.lua", 32));
+        NavigatorProvider.getMinecraft().displayGuiScreen(new GuiEditor("test.lua", 16, NavigatorProvider.getMinecraft().gameSettings, NavigatorProvider.getMinecraft().getTextureManager()));
     }
 }
