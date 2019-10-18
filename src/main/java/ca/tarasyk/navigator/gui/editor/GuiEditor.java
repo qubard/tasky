@@ -49,7 +49,7 @@ public class GuiEditor extends GuiScreen {
     private final int FOREGROUND = 0xFF7C7F6C;
     private final int HIGHLIGHT = 0xFF48493E;
 
-    private final int VISIBLE_LINE_CHAR_WIDTH = 19;
+    private final int VISIBLE_LINE_CHAR_WIDTH = 18;
 
     private FontRenderer monoRenderer;
     private TextureManager textureManager;
@@ -76,7 +76,7 @@ public class GuiEditor extends GuiScreen {
                 cursorRow++;
                 cursorColumn = 0;
                 currColumn = 0;
-            } else if (currColumn < fileLines[currLine].length() && cursorColumn > currColumn + VISIBLE_LINE_CHAR_WIDTH) {
+            } else if (currColumn < fileLines[currLine].length() && cursorColumn >= currColumn + VISIBLE_LINE_CHAR_WIDTH) {
                 currColumn++;
             }
         } else if (keyCode == 203) {
@@ -132,31 +132,8 @@ public class GuiEditor extends GuiScreen {
         drawRect(x, y, x + 176, y + lineHeight, color);
     }
 
-    private void drawString(String str, int x, int y, int color) {
-        GlStateManager.pushMatrix();
-        textureManager.bindTexture(EDITOR_FONT);
-        GlStateManager.scale(2.0f, 0.5f, 1.0f);
-
-        float red = color & 255;
-        float green = (color >> 8) & 255;
-        float blue = (color >> 16) & 255;
-        float alpha = (color >> 24) & 255;
-        GlStateManager.color(red, green, blue, alpha);
-
-        for (int i = 0; i < str.length(); i++) {
-            drawGlyph(str.charAt(i), x + i * 8, y);
-        }
-        GlStateManager.popMatrix();
-    }
-
-    private void drawGlyph(char ch, int x, int y) {
-        int textureX = 8 * (ch % 32);
-        int textureY = 32 * (ch / 32);
-        drawTexturedModalRect(x, y, textureX, textureY, 8, 32);
-    }
-
     private void drawBackground(int x, int y) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(EDITOR);
+        textureManager.bindTexture(EDITOR);
         drawTexturedModalRect(x, y, 0, 0, 192, 176);
     }
 
