@@ -22,7 +22,7 @@ public class GuiEditor extends GuiScreen {
     /**
      * The line number of the first visible row
      */
-    private int currLine = 0;
+    private int currRow = 0;
 
     /**
      * The left-most current visible column
@@ -76,7 +76,7 @@ public class GuiEditor extends GuiScreen {
                 cursorRow++;
                 cursorColumn = 0;
                 currColumn = 0;
-            } else if (currColumn < fileLines[currLine].length() && cursorColumn >= currColumn + VISIBLE_LINE_CHAR_WIDTH) {
+            } else if (currColumn < fileLines[currRow].length() && cursorColumn >= currColumn + VISIBLE_LINE_CHAR_WIDTH) {
                 currColumn++;
             }
         } else if (keyCode == 203) {
@@ -99,10 +99,10 @@ public class GuiEditor extends GuiScreen {
         cursorColumn = Math.max(0, cursorColumn);
         cursorRow = Math.min(Math.max(cursorRow, 0), fileLines.length - 1);
 
-        if (cursorRow >= currLine + MAX_LINES) {
-            currLine++;
-        } else if (cursorRow < currLine) {
-            currLine--;
+        if (cursorRow >= currRow + MAX_LINES) {
+            currRow++;
+        } else if (cursorRow < currRow) {
+            currRow--;
         }
     }
 
@@ -125,7 +125,7 @@ public class GuiEditor extends GuiScreen {
      * @return The maximum width of visible line numbers
      */
     private int maxLineNumberWidth() {
-        return monoRenderer.getStringWidth(String.valueOf(currLine + MAX_LINES));
+        return monoRenderer.getStringWidth(String.valueOf(currRow + MAX_LINES));
     }
 
     private void drawHighlight(int x, int y, int color) {
@@ -147,26 +147,26 @@ public class GuiEditor extends GuiScreen {
 
         for (int line = 0; line < MAX_LINES && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
-            if (line + currLine == cursorRow) {
+            if (line + currRow == cursorRow) {
                 drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT);
             }
 
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
-            String codeLine = fileLines[currLine + line];
+            String codeLine = fileLines[currRow + line];
+            codeLine = currColumn < codeLine.length() ? codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + VISIBLE_LINE_CHAR_WIDTH)) : "";
             drawTextLine(
-                    line + 1 + currLine,
-                    currColumn < codeLine.length() ? codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + VISIBLE_LINE_CHAR_WIDTH)) : "",
+                    line + 1 + currRow,
+                    codeLine,
                     topLeftX + 4,
                     topLeftY + line * lineHeight + 12,
                     lineNumberWidth,
-                    String.valueOf(currLine + MAX_LINES).length());
+                    String.valueOf(currRow + MAX_LINES).length());
 
-            if (line + currLine == cursorRow) {
+            if (line + currRow == cursorRow) {
                 // Draw the cursor
-                // offset from cursorcolumn has to be calculated based on line width up to cursor column
-                int lineOffset = fileLines[cursorRow].substring(currColumn, boundCursorColumn()).length() * 8;
-                System.out.println(fileLines[cursorRow].substring(currColumn, boundCursorColumn()).length());
+                // offset from cursorColumn has to be calculated based on line width up to cursor column
+                int lineOffset = fileLines[cursorRow].substring(Math.min(fileLines[cursorRow].length(), currColumn), boundCursorColumn()).length() * 8;
                 drawRect(topLeftX + lineOffset + lineNumberWidth + 18, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }

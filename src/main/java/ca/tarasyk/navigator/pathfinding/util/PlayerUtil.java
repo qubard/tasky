@@ -2,7 +2,6 @@ package ca.tarasyk.navigator.pathfinding.util;
 
 import ca.tarasyk.navigator.BetterBlockPos;
 import ca.tarasyk.navigator.NavigatorProvider;
-import ca.tarasyk.navigator.api.lua.LuaConstants;
 import ca.tarasyk.navigator.pathfinding.movement.Move;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -24,7 +23,6 @@ public class PlayerUtil {
     }
 
     public static float yawFrom(BetterBlockPos src, BetterBlockPos dest) {
-        EntityPlayer p = NavigatorProvider.getPlayer();
         double dx = src.getX() - dest.getX();
         double dz = src.getZ() - dest.getZ();
         float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
@@ -32,7 +30,6 @@ public class PlayerUtil {
     }
 
     public static float yawFrom(double x, double z, BetterBlockPos dest, int dx1, int dz1) {
-        EntityPlayer p = NavigatorProvider.getPlayer();
         double dx = x - dest.getX() - 0.5 - 0.5 * Integer.compare(dx1, 0);
         double dz = z - dest.getZ() - 0.5 - 0.5 * Integer.compare(dz1, 0);
         float yaw = 180 - (float) (Math.atan2(dx, dz) * 180f / Math.PI);
