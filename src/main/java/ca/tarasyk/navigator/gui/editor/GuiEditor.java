@@ -1,11 +1,8 @@
 package ca.tarasyk.navigator.gui.editor;
 
-import ca.tarasyk.navigator.NavigatorProvider;
 import ca.tarasyk.navigator.ScriptHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
@@ -23,11 +20,6 @@ public class GuiEditor extends GuiScreen {
      * The line number of the first visible row
      */
     private int currRow = 0;
-
-    /**
-     * The left-most current visible column
-     */
-    private int currColumn = 0;
 
     /**
      * The maximum number of rendered lines
@@ -75,9 +67,6 @@ public class GuiEditor extends GuiScreen {
             if (cursorRow != fileLines.length - 1 && cursorColumn > fileLines[cursorRow].length()) {
                 cursorRow++;
                 cursorColumn = 0;
-                currColumn = 0;
-            } else if (currColumn < fileLines[currRow].length() && cursorColumn >= currColumn + VISIBLE_LINE_CHAR_WIDTH) {
-                currColumn++;
             }
         } else if (keyCode == 203) {
             // Bind the cursor column before iterating
@@ -87,8 +76,6 @@ public class GuiEditor extends GuiScreen {
             if (cursorColumn < 0) {
                 cursorRow--;
                 //cursorColumn = end of previous line (updates window too)
-            } else if (cursorColumn < currColumn) {
-                currColumn--;
             }
         } else if (keyCode == 200) {
             cursorRow--;
@@ -145,6 +132,14 @@ public class GuiEditor extends GuiScreen {
 
         drawBackground(topLeftX, topLeftY);
 
+        // Calculate the camera column position
+        String currLine = fileLines[cursorRow];
+        int cameraColumn = Math.max(0, cursorColumn - (VISIBLE_LINE_CHAR_WIDTH + 3));
+
+        if (cursorColumn + 3 >= currLine.length()) {
+            cameraColumn = Math.max(0, currLine.length() - VISIBLE_LINE_CHAR_WIDTH);
+        }
+
         for (int line = 0; line < MAX_LINES && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
             if (line + currRow == cursorRow) {
@@ -154,7 +149,13 @@ public class GuiEditor extends GuiScreen {
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
             String codeLine = fileLines[currRow + line];
-            codeLine = currColumn < codeLine.length() ? codeLine.substring(currColumn, Math.min(codeLine.length(), currColumn + VISIBLE_LINE_CHAR_WIDTH)) : "";
+
+            // Draw lines w.r.t camera and cursor position (we determine cameraColumn from cursorColumn)
+            // currColumn can be found out from cursorColumn, since currColumn is what we use
+            // currColumn = last index of line if cursorColumn exceeds line length
+            // keep 3 chars on the right
+
+            codeLine = cameraColumn < codeLine.length() ? codeLine.substring(cameraColumn, Math.min(codeLine.length(), cameraColumn + VISIBLE_LINE_CHAR_WIDTH)) : "";
             drawTextLine(
                     line + 1 + currRow,
                     codeLine,
@@ -166,7 +167,7 @@ public class GuiEditor extends GuiScreen {
             if (line + currRow == cursorRow) {
                 // Draw the cursor
                 // offset from cursorColumn has to be calculated based on line width up to cursor column
-                int lineOffset = fileLines[cursorRow].substring(Math.min(fileLines[cursorRow].length(), currColumn), boundCursorColumn()).length() * 8;
+                int lineOffset = (cursorColumn - cameraColumn) * 8;
                 drawRect(topLeftX + lineOffset + lineNumberWidth + 18, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }
