@@ -24,7 +24,7 @@ public class GuiEditor extends GuiScreen {
     /**
      * The maximum number of rendered lines
      */
-    private final int MAX_LINES = 10;
+    private final int MAX_VISIBLE_LINES = 10;
 
     /**
      * Keep track of the cursor position (row, col) wise
@@ -86,7 +86,7 @@ public class GuiEditor extends GuiScreen {
         cursorColumn = Math.max(0, cursorColumn);
         cursorRow = Math.min(Math.max(cursorRow, 0), fileLines.length - 1);
 
-        if (cursorRow >= currRow + MAX_LINES) {
+        if (cursorRow >= currRow + MAX_VISIBLE_LINES) {
             currRow++;
         } else if (cursorRow < currRow) {
             currRow--;
@@ -112,7 +112,7 @@ public class GuiEditor extends GuiScreen {
      * @return The maximum width of visible line numbers
      */
     private int maxLineNumberWidth() {
-        return monoRenderer.getStringWidth(String.valueOf(currRow + MAX_LINES));
+        return monoRenderer.getStringWidth(String.valueOf(currRow + MAX_VISIBLE_LINES));
     }
 
     private void drawHighlight(int x, int y, int color) {
@@ -134,13 +134,13 @@ public class GuiEditor extends GuiScreen {
 
         // Calculate the camera column position
         String currLine = fileLines[cursorRow];
-        int cameraColumn = Math.max(0, cursorColumn - (VISIBLE_LINE_CHAR_WIDTH + 3));
+        int cameraColumn = Math.max(0, cursorColumn - (VISIBLE_LINE_CHAR_WIDTH - 3));
 
         if (cursorColumn + 3 >= currLine.length()) {
             cameraColumn = Math.max(0, currLine.length() - VISIBLE_LINE_CHAR_WIDTH);
         }
 
-        for (int line = 0; line < MAX_LINES && line < fileLines.length; line++) {
+        for (int line = 0; line < MAX_VISIBLE_LINES && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
             if (line + currRow == cursorRow) {
                 drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT);
@@ -162,12 +162,12 @@ public class GuiEditor extends GuiScreen {
                     topLeftX + 4,
                     topLeftY + line * lineHeight + 12,
                     lineNumberWidth,
-                    String.valueOf(currRow + MAX_LINES).length());
+                    String.valueOf(currRow + MAX_VISIBLE_LINES).length());
 
             if (line + currRow == cursorRow) {
                 // Draw the cursor
                 // offset from cursorColumn has to be calculated based on line width up to cursor column
-                int lineOffset = (cursorColumn - cameraColumn) * 8;
+                int lineOffset = (Math.min(currLine.length(), cursorColumn) - cameraColumn) * 8;
                 drawRect(topLeftX + lineOffset + lineNumberWidth + 18, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
             }
         }
