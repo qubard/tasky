@@ -32,6 +32,9 @@ public class GuiEditor extends GuiScreen {
     private int cursorRow = 0;
     private int cursorColumn = 0;
 
+
+    private int cameraColumn = 0;
+
     /**
      * The height (in pixels) of a line
      */
@@ -91,6 +94,16 @@ public class GuiEditor extends GuiScreen {
         } else if (cursorRow < currRow) {
             currRow--;
         }
+
+        String currLine = fileLines[cursorRow];
+        if (cameraColumn >= currLine.length()) {
+            // If cameraColumn is not visible already, update it
+            cameraColumn = Math.max(0, cursorColumn - (VISIBLE_LINE_CHAR_WIDTH - 3));
+        }
+
+        if (cursorColumn + 3 >= currLine.length()) {
+            cameraColumn = Math.max(0, currLine.length() - VISIBLE_LINE_CHAR_WIDTH);
+        }
     }
 
     /**
@@ -115,8 +128,8 @@ public class GuiEditor extends GuiScreen {
         return monoRenderer.getStringWidth(String.valueOf(currRow + MAX_VISIBLE_LINES));
     }
 
-    private void drawHighlight(int x, int y, int color) {
-        drawRect(x, y, x + 176, y + lineHeight, color);
+    private void drawHighlight(int x, int y, int color, int width) {
+        drawRect(x, y, x + width, y + lineHeight, color);
     }
 
     private void drawBackground(int x, int y) {
@@ -134,16 +147,11 @@ public class GuiEditor extends GuiScreen {
 
         // Calculate the camera column position
         String currLine = fileLines[cursorRow];
-        int cameraColumn = Math.max(0, cursorColumn - (VISIBLE_LINE_CHAR_WIDTH - 3));
-
-        if (cursorColumn + 3 >= currLine.length()) {
-            cameraColumn = Math.max(0, currLine.length() - VISIBLE_LINE_CHAR_WIDTH);
-        }
 
         for (int line = 0; line < MAX_VISIBLE_LINES && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
             if (line + currRow == cursorRow) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT);
+                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT, 176);
             }
 
             // Draw a text line
