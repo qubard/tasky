@@ -34,9 +34,10 @@ public class GuiEditor extends GuiScreen {
      */
     private int lineHeight;
 
-    private final int BACKGROUND = 0xFFF8F8F2;
-    private final int FOREGROUND = 0xFF7C7F6C;
-    private final int HIGHLIGHT = 0xFF48493E;
+    private final int BACKGROUND_COLOR = 0xFFF8F8F2;
+    private final int FOREGROUND_COLOR = 0xFF7C7F6C;
+    private final int HIGHLIGHT_COLOR = 0xFF48493E;
+    private final int EDITOR_COLOR = 0xFF272822;
 
     /**
      * The number of visible characters per line
@@ -88,13 +89,16 @@ public class GuiEditor extends GuiScreen {
         }
 
         cursorColumn = Math.max(0, cursorColumn);
-        cursorColumn = boundCursorColumn();
         cursorRow = Math.min(Math.max(cursorRow, 0), fileLines.length - 1);
 
         if (cursorRow >= currRow + LINE_COUNT) {
             currRow++;
         } else if (cursorRow < currRow) {
             currRow--;
+        }
+
+        if (cursorColumn > getCurrentLine().length()) {
+            cursorColumn = boundCursorColumn();
         }
 
         updateCameraColumn();
@@ -127,8 +131,8 @@ public class GuiEditor extends GuiScreen {
     private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber) {
         // Draw line number
         int len = String.valueOf(lineNumber).length();
-        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - len) * 8, y, FOREGROUND);
-        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND);
+        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - len) * 8, y, FOREGROUND_COLOR);
+        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND_COLOR);
     }
 
     /**
@@ -147,9 +151,18 @@ public class GuiEditor extends GuiScreen {
         drawRect(x, y, x + width, y + lineHeight, color);
     }
 
-    private void drawBackground(int x, int y) {
+    private void drawBackground(int x, int y, int scaleX, int scaleY) {
         textureManager.bindTexture(EDITOR);
-        drawTexturedModalRect(x, y, 0, 0, 192, 176);
+        drawScaledCustomSizeModalRect(x, y, 0, 0, 8, 8, 8, 8,256, 256); // top left corner
+        drawScaledCustomSizeModalRect(x + 8 + 176 * scaleX, y, 184, 0, 8, 8, 8, 8, 256, 256); // top right corner
+        drawScaledCustomSizeModalRect(x, y + 8 + 160 * scaleY, 0, 168, 8, 8, 8, 8, 256, 256); // bottom left corner
+        drawScaledCustomSizeModalRect(x + 8 + 176 * scaleX, y + 8 + 160 * scaleY, 184, 168, 8, 8, 8, 8, 256, 256); // bottom right corner
+        drawScaledCustomSizeModalRect(x + 8, y, 8, 0, 1, 8, 176 * scaleX, 8, 256, 256); // top
+        drawScaledCustomSizeModalRect(x, y + 8, 0, 8, 8, 1, 8, 160 * scaleY, 256, 256); // left
+        drawScaledCustomSizeModalRect(x + 176 * scaleX + 8, y + 8, 184, 8, 8, 1, 8, 160 * scaleY, 256, 256); // right
+        drawScaledCustomSizeModalRect(x + 8, y + 8 + 160 * scaleY, 8, 168, 1, 8, 176 * scaleX, 8, 256, 256); // bottom
+
+        drawRect(x + 8, y + 8, x + 8 + 176 * scaleX, y + 8 + 160 * scaleY, EDITOR_COLOR);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -160,7 +173,7 @@ public class GuiEditor extends GuiScreen {
         int topLeftX = (width - 192 * scaleX) / 2;
         int topLeftY = (height - 166 * scaleY) / 2;
 
-        drawBackground(topLeftX, topLeftY);
+        drawBackground(topLeftX, topLeftY, scaleX, scaleY);
 
         String currLine = getCurrentLine();
 
@@ -169,7 +182,7 @@ public class GuiEditor extends GuiScreen {
         for (int line = 0; line < LINE_COUNT && line < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
             if (line + currRow == cursorRow) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT, 176 * scaleX);
+                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, 176 * scaleX);
             }
 
             // Draw a text line
