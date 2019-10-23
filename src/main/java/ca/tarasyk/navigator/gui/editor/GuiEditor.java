@@ -35,7 +35,7 @@ public class GuiEditor extends GuiScreen {
      */
     private int lineHeight;
 
-    private final int EDITOR_FONT_COLOR = 0xFFFFFFFF;
+    private final int EDITOR_FONT_COLOR = 0xFFF8F8F2;
     private final int FOREGROUND_COLOR = 0xFF7C7F6C;
     private final int HIGHLIGHT_COLOR = 0xFF48493E;
     private final int EDITOR_COLOR = 0xFF272822;
@@ -66,16 +66,6 @@ public class GuiEditor extends GuiScreen {
         } catch (IOException err) {
             err.printStackTrace();
         }
-    }
-
-    public void onResize(Minecraft mcIn, int width, int height)
-    {
-        super.onResize(mcIn, width, height);
-        width *= 2;
-        height *= 2;
-        scaleX = width / 854.0;
-        scaleY = height / 480.0;
-        resizeEditor(width, height);
     }
 
     public void keyTyped(char typedChar, int keyCode) throws IOException {
@@ -155,6 +145,16 @@ public class GuiEditor extends GuiScreen {
      */
     private int maxLineNumberWidth() {
         return monoRenderer.getStringWidth(String.valueOf(currRow + LINE_COUNT));
+    }
+
+    public void onResize(Minecraft mcIn, int width, int height) {
+        // TODO: Adjust width of editor container based on width = (lineNumberWidth + 14 + BORDER LENGTH (16)) + line width for text
+        super.onResize(mcIn, width, height);
+        width *= 2;
+        height *= 2;
+        scaleX = width / 854.0;
+        scaleY = height / 480.0;
+        resizeEditor(width, height);
     }
 
     private void resizeEditor(int screenWidth, int screenHeight) {
