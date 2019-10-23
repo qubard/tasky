@@ -1,6 +1,7 @@
 package ca.tarasyk.navigator.gui.editor;
 
 import ca.tarasyk.navigator.ScriptHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -34,15 +35,19 @@ public class GuiEditor extends GuiScreen {
      */
     private int lineHeight;
 
-    private final int BACKGROUND_COLOR = 0xFFF8F8F2;
+    private final int EDITOR_FONT_COLOR = 0xFFFFFFFF;
     private final int FOREGROUND_COLOR = 0xFF7C7F6C;
     private final int HIGHLIGHT_COLOR = 0xFF48493E;
     private final int EDITOR_COLOR = 0xFF272822;
+    private final int HIGHLIGHTED_LINE_NUMBER_COLOR = 0xFFC2C6AB;
+
+    private double scaleX = 1;
+    private double scaleY = 1;
 
     /**
      * The number of visible characters per line
      */
-    private int LINE_WIDTH = 18;
+    private int LINE_CHAR_COUNT = 18;
     /**
      * The maximum number of rendered lines
      */
@@ -54,13 +59,23 @@ public class GuiEditor extends GuiScreen {
     public GuiEditor(String scriptName, int lineHeight, GameSettings gameSettings, TextureManager textureManager) {
         try {
             String fileBytes = ScriptHelper.loadScript("tasky", scriptName);
-            fileLines = fileBytes.split("\\r?\\n");
+            fileLines = fileBytes.split("\\r?\\n"); // Split based on newline tokens
             this.lineHeight = lineHeight;
             this.textureManager = textureManager;
             monoRenderer = new MonoFontRenderer(gameSettings, EDITOR_FONT, textureManager, true);
         } catch (IOException err) {
             err.printStackTrace();
         }
+    }
+
+    public void onResize(Minecraft mcIn, int width, int height)
+    {
+        super.onResize(mcIn, width, height);
+        width *= 2;
+        height *= 2;
+        scaleX = width / 854.0;
+        scaleY = height / 480.0;
+        resizeEditor(width, height);
     }
 
     public void keyTyped(char typedChar, int keyCode) throws IOException {
@@ -114,9 +129,9 @@ public class GuiEditor extends GuiScreen {
     }
 
     private void updateCameraColumn() {
-        if (cursorColumn <= cameraColumn || cursorColumn >= cameraColumn + LINE_WIDTH) {
+        if (cursorColumn <= cameraColumn || cursorColumn >= cameraColumn + LINE_CHAR_COUNT) {
             // If the cursor is not visible, update cameraColumn
-            cameraColumn = Math.max(0, cursorColumn - (LINE_WIDTH - 3));
+            cameraColumn = Math.max(0, cursorColumn - (LINE_CHAR_COUNT - 3));
         }
     }
 
@@ -128,11 +143,11 @@ public class GuiEditor extends GuiScreen {
         return Math.min(getCurrentLine().length(), cursorColumn);
     }
 
-    private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber) {
+    private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber, boolean highlight) {
         // Draw line number
         int len = String.valueOf(lineNumber).length();
-        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - len) * 8, y, FOREGROUND_COLOR);
-        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, BACKGROUND_COLOR);
+        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - len) * 8, y, highlight ? HIGHLIGHTED_LINE_NUMBER_COLOR : FOREGROUND_COLOR);
+        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, EDITOR_FONT_COLOR);
     }
 
     /**
@@ -144,45 +159,45 @@ public class GuiEditor extends GuiScreen {
 
     private void resizeEditor(int screenWidth, int screenHeight) {
         LINE_COUNT = (int) (screenHeight * 10.0 / 480.0);
-        LINE_WIDTH = (int) (screenWidth * 18.0 / 854.0);
+        LINE_CHAR_COUNT = (int) (screenWidth * 18.0 / 854.0);
     }
 
     private void drawHighlight(int x, int y, int color, int width) {
         drawRect(x, y, x + width, y + lineHeight, color);
     }
 
-    private void drawBackground(int x, int y, int scaleX, int scaleY) {
+    private void drawBackground(int x, int y, double scaleX, double scaleY) {
         textureManager.bindTexture(EDITOR);
+        int dx = (int) (176.0 * scaleX);
+        int dy = (int) (160.0 * scaleY);
         drawScaledCustomSizeModalRect(x, y, 0, 0, 8, 8, 8, 8,256, 256); // top left corner
-        drawScaledCustomSizeModalRect(x + 8 + 176 * scaleX, y, 184, 0, 8, 8, 8, 8, 256, 256); // top right corner
-        drawScaledCustomSizeModalRect(x, y + 8 + 160 * scaleY, 0, 168, 8, 8, 8, 8, 256, 256); // bottom left corner
-        drawScaledCustomSizeModalRect(x + 8 + 176 * scaleX, y + 8 + 160 * scaleY, 184, 168, 8, 8, 8, 8, 256, 256); // bottom right corner
-        drawScaledCustomSizeModalRect(x + 8, y, 8, 0, 1, 8, 176 * scaleX, 8, 256, 256); // top
-        drawScaledCustomSizeModalRect(x, y + 8, 0, 8, 8, 1, 8, 160 * scaleY, 256, 256); // left
-        drawScaledCustomSizeModalRect(x + 176 * scaleX + 8, y + 8, 184, 8, 8, 1, 8, 160 * scaleY, 256, 256); // right
-        drawScaledCustomSizeModalRect(x + 8, y + 8 + 160 * scaleY, 8, 168, 1, 8, 176 * scaleX, 8, 256, 256); // bottom
+        drawScaledCustomSizeModalRect(x + 8 + dx, y, 184, 0, 8, 8, 8, 8, 256, 256); // top right corner
+        drawScaledCustomSizeModalRect(x, y + 8 + dy, 0, 168, 8, 8, 8, 8, 256, 256); // bottom left corner
+        drawScaledCustomSizeModalRect(x + 8 + dx, y + 8 + dy, 184, 168, 8, 8, 8, 8, 256, 256); // bottom right corner
+        drawScaledCustomSizeModalRect(x + 8, y, 8, 0, 1, 8, dx, 8, 256, 256); // top
+        drawScaledCustomSizeModalRect(x, y + 8, 0, 8, 8, 1, 8, dy, 256, 256); // left
+        drawScaledCustomSizeModalRect(x + 8 + dx, y + 8, 184, 8, 8, 1, 8, dy, 256, 256); // right
+        drawScaledCustomSizeModalRect(x + 8, y + 8 + dy, 8, 168, 1, 8, dx, 8, 256, 256); // bottom
 
-        drawRect(x + 8, y + 8, x + 8 + 176 * scaleX, y + 8 + 160 * scaleY, EDITOR_COLOR);
+        drawRect(x + 8, y + 8, x + 8 + dx, y + 8 + dy, EDITOR_COLOR);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        int scaleX = super.mc.displayWidth / 854;
-        int scaleY = super.mc.displayHeight / 480;
-        int topLeftX = (width - 192 * scaleX) / 2;
-        int topLeftY = (height - 166 * scaleY) / 2;
+        int topLeftX = (int) ((width - 192 * scaleX) / 2);
+        int topLeftY = (int) ((height - 166 * scaleY) / 2);
 
         drawBackground(topLeftX, topLeftY, scaleX, scaleY);
 
         String currLine = getCurrentLine();
 
-        resizeEditor(super.mc.displayWidth, super.mc.displayHeight);
-
-        for (int line = 0; line < LINE_COUNT && line < fileLines.length; line++) {
+        for (int line = 0; line < LINE_COUNT && line + currRow < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
-            if (line + currRow == cursorRow) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, 176 * scaleX);
+            boolean highlight = line + currRow == cursorRow;
+
+            if (highlight) {
+                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, (int) (176 * scaleX));
             }
 
             // Draw a text line
@@ -194,14 +209,14 @@ public class GuiEditor extends GuiScreen {
             // currColumn = last index of line if cursorColumn exceeds line length
             // keep 3 chars on the right
 
-            codeLine = cameraColumn < codeLine.length() ? codeLine.substring(cameraColumn, Math.min(codeLine.length(), cameraColumn + LINE_WIDTH)) : "";
+            codeLine = cameraColumn < codeLine.length() ? codeLine.substring(cameraColumn, Math.min(codeLine.length(), cameraColumn + LINE_CHAR_COUNT)) : "";
             drawTextLine(
                     line + 1 + currRow,
                     codeLine,
                     topLeftX + 4,
                     topLeftY + line * lineHeight + 12,
                     lineNumberWidth,
-                    String.valueOf(currRow + LINE_COUNT).length());
+                    String.valueOf(currRow + LINE_COUNT).length(), highlight);
 
             if (line + currRow == cursorRow) {
                 // Draw the cursor

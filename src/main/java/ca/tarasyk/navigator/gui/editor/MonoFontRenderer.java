@@ -158,21 +158,19 @@ public class MonoFontRenderer extends FontRenderer {
         int i = getCharWidth(ch);
         bindTexture(locationFontTexture);
         int k = i >>> 4;
-        int l = i & 15;
         float f = (float)k;
-        float f1 = (float)(l + 1);
         float f2 = (float)(ch % 32 * 8) + f;
         float f3 = (float)((ch & 255) / 32 * 8);
-        float f4 = f1 - f;
+        float f4 = 8.0f;
         GlStateManager.glBegin(5);
         GlStateManager.glTexCoord2f(f2 / 256.0F, f3 / 64.0F);
         GlStateManager.glVertex3f(this.posX, this.posY, 0.0F);
-        GlStateManager.glTexCoord2f(f2 / 256.0F, (f3 + 7.98F) / 64.0F);
+        GlStateManager.glTexCoord2f(f2 / 256.0F, (f3 + 8.00F) / 64.0F);
         GlStateManager.glVertex3f(this.posX, this.posY + 7.99F, 0.0F);
         GlStateManager.glTexCoord2f((f2 + f4) / 256.0F, f3 / 64.0F);
         GlStateManager.glVertex3f(this.posX + f4, this.posY, 0.0F);
-        GlStateManager.glTexCoord2f((f2 + f4) / 256.0F, (f3 + 7.98F) / 64.0F);
-        GlStateManager.glVertex3f(this.posX + f4, this.posY + 7.99F, 0.0F);
+        GlStateManager.glTexCoord2f((f2 + f4) / 256.0F, (f3 + 8.00F) / 64.0F);
+        GlStateManager.glVertex3f(this.posX + f4, this.posY + 8.00F, 0.0F);
         GlStateManager.glEnd();
         return 8.0f;
     }

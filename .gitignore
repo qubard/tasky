@@ -16,3 +16,5 @@ classes/
 .idea/
 *.iml
 /logs/
+*.iws
+*.ipr
