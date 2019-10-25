@@ -57,9 +57,9 @@ public class GuiEditor extends GuiScreen {
     private FontRenderer monoRenderer;
     private TextureManager textureManager;
 
-    public GuiEditor(String scriptName, int lineHeight, GameSettings gameSettings, TextureManager textureManager) {
+    public GuiEditor(String fileName, int lineHeight, GameSettings gameSettings, TextureManager textureManager) {
         try {
-            String fileBytes = ScriptHelper.loadScript("tasky", scriptName);
+            String fileBytes = ScriptHelper.loadScript("tasky", fileName);
             fileLines = fileBytes.split("\\r?\\n"); // Split based on newline tokens
             this.lineHeight = lineHeight;
             this.textureManager = textureManager;
@@ -67,6 +67,11 @@ public class GuiEditor extends GuiScreen {
         } catch (IOException err) {
             err.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
     }
 
     public void keyTyped(char typedChar, int keyCode) throws IOException {
