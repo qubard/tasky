@@ -48,6 +48,7 @@ public class GuiEditor extends GuiScreen {
      * The number of visible characters per line
      */
     private int LINE_CHAR_COUNT = 18;
+
     /**
      * The maximum number of rendered lines
      */
@@ -149,6 +150,17 @@ public class GuiEditor extends GuiScreen {
 
     public void onResize(Minecraft mcIn, int width, int height) {
         // TODO: Adjust width of editor container based on width = (lineNumberWidth + 14 + BORDER LENGTH (16)) + line width for text
+        // TODO: Support resizing container with click + drag (bottom right, 3 dots resize icon) (it would be cool to have a blue opacity highlight effect when this happens)
+        // TODO: Basic add/edit line functionality
+        // TODO: Save file support
+        // TODO: Integrate with some other gui to edit actual lua files
+        // TODO: Syntax highlighting
+        // TODO: Comment color highlighting
+        // TODO: Rename from navigator to Tasky
+        // TODO: Release
+        // TODO: Click to move cursor
+        // TODO: Resizing container cursor bug?
+
         super.onResize(mcIn, width, height);
         width *= 2;
         height *= 2;
@@ -168,8 +180,8 @@ public class GuiEditor extends GuiScreen {
 
     private void drawBackground(int x, int y, double scaleX, double scaleY) {
         textureManager.bindTexture(EDITOR);
-        int dx = (int) (176.0 * scaleX);
-        int dy = (int) (160.0 * scaleY);
+        int dx = maxLineNumberWidth() + 14 + LINE_CHAR_COUNT * 8;
+        int dy = (8 + 4 + 4) * LINE_COUNT; // Each line has 4px of padding + 8px for the glyph
         drawScaledCustomSizeModalRect(x, y, 0, 0, 8, 8, 8, 8,256, 256); // top left corner
         drawScaledCustomSizeModalRect(x + 8 + dx, y, 184, 0, 8, 8, 8, 8, 256, 256); // top right corner
         drawScaledCustomSizeModalRect(x, y + 8 + dy, 0, 168, 8, 8, 8, 8, 256, 256); // bottom left corner
@@ -197,7 +209,7 @@ public class GuiEditor extends GuiScreen {
             boolean highlight = line + currRow == cursorRow;
 
             if (highlight) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, (int) (176 * scaleX));
+                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, maxLineNumberWidth() + 14 + LINE_CHAR_COUNT * 8);
             }
 
             // Draw a text line
