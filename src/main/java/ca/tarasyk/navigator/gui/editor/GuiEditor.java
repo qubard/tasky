@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -238,7 +237,7 @@ public class GuiEditor extends GuiScreen {
         textureManager.bindTexture(EDITOR);
         int editorWidth = getEditorWidth();
         int editorHeight = getEditorHeight();
-        drawScaledCustomSizeModalRect(x, y, 0, 0, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,256, 256); // top left corner
+        drawScaledCustomSizeModalRect(x, y, 0, 0, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // top left corner
         drawScaledCustomSizeModalRect(x + BORDER_SIZE + editorWidth, y, 184, 0, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // top right corner
         drawScaledCustomSizeModalRect(x, y + BORDER_SIZE + editorHeight, 0, 168, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // bottom left corner
         drawScaledCustomSizeModalRect(x + BORDER_SIZE + editorWidth, y + BORDER_SIZE + editorHeight, 184, 168, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // bottom right corner
@@ -270,12 +269,12 @@ public class GuiEditor extends GuiScreen {
 
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
-            String codeLine = getLine(line);
+            String textStr = getLine(line);
 
-            codeLine = cameraColumn < codeLine.length() ? codeLine.substring(cameraColumn, Math.min(codeLine.length(), cameraColumn + LINE_CHAR_COUNT)) : "";
+            textStr = cameraColumn < textStr.length() ? textStr.substring(cameraColumn, Math.min(textStr.length(), cameraColumn + LINE_CHAR_COUNT)) : "";
             drawTextLine(
                     line + 1 + cameraRow,
-                    codeLine,
+                    textStr,
                     topLeftX + BORDER_SIZE,
                     topLeftY + line * lineHeight + BORDER_SIZE + 4,
                     lineNumberWidth,
