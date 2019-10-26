@@ -177,6 +177,7 @@ public class GuiEditor extends GuiScreen {
 
     /**
      * Bind cursorColumn to not exceed the length of the current line
+     *
      * @return cursorColumn at most the length of the current line
      */
     private int boundCursorColumn() {
@@ -292,7 +293,7 @@ public class GuiEditor extends GuiScreen {
 
     private void handleMouseOverText(int mouseX, int mouseY) {
         if (mouseX >= topLeftX + BORDER_SIZE && mouseX <= topLeftX + BORDER_SIZE + getEditorWidth()
-        && mouseY >= topLeftY + BORDER_SIZE && mouseY <= topLeftY + BORDER_SIZE + getEditorHeight()) {
+                && mouseY >= topLeftY + BORDER_SIZE && mouseY <= topLeftY + BORDER_SIZE + getEditorHeight()) {
             System.out.println("Moused over text");
         }
     }

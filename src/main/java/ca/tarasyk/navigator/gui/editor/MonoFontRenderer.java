@@ -21,34 +21,28 @@ public class MonoFontRenderer extends FontRenderer {
     }
 
     @Override
-    public int getCharWidth(char character)
-    {
+    public int getCharWidth(char character) {
         return 8;
     }
 
     /**
      * Draws the specified string.
      */
-    public int drawString(String text, int x, int y, int color)
-    {
-        return this.drawString(text, (float)x, (float)y, color, false);
+    public int drawString(String text, int x, int y, int color) {
+        return this.drawString(text, (float) x, (float) y, color, false);
     }
 
     /**
      * Draws the specified string.
      */
-    public int drawString(String text, float x, float y, int color, boolean dropShadow)
-    {
+    public int drawString(String text, float x, float y, int color, boolean dropShadow) {
         enableAlpha();
         int i;
 
-        if (dropShadow)
-        {
+        if (dropShadow) {
             i = this.renderString(text, x + 1.0F, y + 1.0F, color, true);
             i = Math.max(i, this.renderString(text, x, y, color, false));
-        }
-        else
-        {
+        } else {
             i = this.renderString(text, x, y, color, false);
         }
 
@@ -58,16 +52,12 @@ public class MonoFontRenderer extends FontRenderer {
     /**
      * Apply Unicode Bidirectional Algorithm to string and return a new possibly reordered string for visual rendering.
      */
-    private String bidiReorder(String text)
-    {
-        try
-        {
+    private String bidiReorder(String text) {
+        try {
             Bidi bidi = new Bidi((new ArabicShaping(8)).shape(text), 127);
             bidi.setReorderingMode(0);
             return bidi.writeReordered(2);
-        }
-        catch (ArabicShapingException var3)
-        {
+        } catch (ArabicShapingException var3) {
             return text;
         }
     }
@@ -75,62 +65,51 @@ public class MonoFontRenderer extends FontRenderer {
     /**
      * Render single line string by setting GL color, current (posX,posY), and calling renderStringAtPos()
      */
-    private int renderString(String text, float x, float y, int color, boolean dropShadow)
-    {
-        if (text == null)
-        {
+    private int renderString(String text, float x, float y, int color, boolean dropShadow) {
+        if (text == null) {
             return 0;
-        }
-        else
-        {
-            if (getBidiFlag())
-            {
+        } else {
+            if (getBidiFlag()) {
                 text = this.bidiReorder(text);
             }
 
-            if ((color & -67108864) == 0)
-            {
+            if ((color & -67108864) == 0) {
                 color |= -16777216;
             }
 
-            if (dropShadow)
-            {
+            if (dropShadow) {
                 color = (color & 16579836) >> 2 | color & -16777216;
             }
 
-            float red = (float)(color >> 16 & 255) / 255.0F;
-            float blue = (float)(color >> 8 & 255) / 255.0F;
-            float green = (float)(color & 255) / 255.0F;
-            float alpha = (float)(color >> 24 & 255) / 255.0F;
+            float red = (float) (color >> 16 & 255) / 255.0F;
+            float blue = (float) (color >> 8 & 255) / 255.0F;
+            float green = (float) (color & 255) / 255.0F;
+            float alpha = (float) (color >> 24 & 255) / 255.0F;
             setColor(red, blue, green, alpha);
             this.posX = x;
             this.posY = y;
             this.renderStringAtPos(text, dropShadow);
-            return (int)this.posX;
+            return (int) this.posX;
         }
     }
 
     /**
      * Render a single line string at the current (posX,posY) and update posX
      */
-    private void renderStringAtPos(String text, boolean shadow)
-    {
-        for (int i = 0; i < text.length(); ++i)
-        {
+    private void renderStringAtPos(String text, boolean shadow) {
+        for (int i = 0; i < text.length(); ++i) {
             char c0 = text.charAt(i);
 
             float f1 = 0.5f;
 
-            if (shadow)
-            {
+            if (shadow) {
                 this.posX -= f1;
                 this.posY -= f1;
             }
 
             float f = this.renderChar(c0, false);
 
-            if (shadow)
-            {
+            if (shadow) {
                 this.posX += f1;
                 this.posY += f1;
             }
@@ -141,14 +120,10 @@ public class MonoFontRenderer extends FontRenderer {
     /**
      * Render the given char
      */
-    private float renderChar(char ch, boolean italic)
-    {
-        if (ch == ' ')
-        {
+    private float renderChar(char ch, boolean italic) {
+        if (ch == ' ') {
             return 8.0F;
-        }
-        else
-        {
+        } else {
             return this.renderUnicodeChar(ch, italic);
         }
     }
@@ -158,9 +133,9 @@ public class MonoFontRenderer extends FontRenderer {
         int i = getCharWidth(ch);
         bindTexture(locationFontTexture);
         int k = i >>> 4;
-        float f = (float)k;
-        float f2 = (float)(ch % 32 * 8) + f;
-        float f3 = (float)((ch & 255) / 32 * 8);
+        float f = (float) k;
+        float f2 = (float) (ch % 32 * 8) + f;
+        float f3 = (float) ((ch & 255) / 32 * 8);
         float f4 = 8.0f;
         GlStateManager.glBegin(5);
         GlStateManager.glTexCoord2f(f2 / 256.0F, f3 / 64.0F);
