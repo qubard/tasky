@@ -7,6 +7,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Cursor;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 
@@ -18,16 +20,12 @@ public class GuiEditor extends GuiScreen {
     private String[] fileLines;
 
     /**
-     * The line number of the first visible row
-     */
-    private int currRow = 0;
-
-    /**
      * Keep track of the cursor position (row, col) wise
      */
     private int cursorRow = 0;
     private int cursorColumn = 0;
 
+    private int cameraRow = 0;
     private int cameraColumn = 0;
 
     /**
@@ -43,6 +41,11 @@ public class GuiEditor extends GuiScreen {
 
     private double scaleX = 1;
     private double scaleY = 1;
+
+    private int topLeftX = 0;
+    private int topLeftY = 0;
+
+    private final int BORDER_SIZE = 8;
 
     /**
      * The number of visible characters per line
@@ -64,6 +67,7 @@ public class GuiEditor extends GuiScreen {
             this.lineHeight = lineHeight;
             this.textureManager = textureManager;
             monoRenderer = new MonoFontRenderer(gameSettings, EDITOR_FONT, textureManager, true);
+            calcEditorPos();
         } catch (IOException err) {
             err.printStackTrace();
         }
@@ -72,6 +76,40 @@ public class GuiEditor extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        handleEditorClick(mouseX, mouseY, mouseButton);
+    }
+
+    private void handleEditorClick(int mouseX, int mouseY, int mouseButton) {
+        int editorPointX = mouseX - (topLeftX + maxLineNumberWidth() + BORDER_SIZE + 10);
+        int editorPointY = mouseY - (topLeftY + BORDER_SIZE);
+
+        int nextRow = editorPointY / lineHeight + cameraRow;
+        if (nextRow >= 0 && nextRow < fileLines.length) {
+            cursorRow = nextRow;
+        }
+
+        if (editorPointX >= 0) {
+            cursorColumn = (int) Math.round((editorPointX) / 8.0) + cameraColumn;
+        }
+    }
+
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        handleScrollInput();
+    }
+
+    private void handleScrollInput() {
+        int scrollDir = -1 * Integer.signum(Mouse.getEventDWheel());
+
+        if (scrollDir != 0) {
+            if (cameraRow + scrollDir >= 0 && cameraRow + scrollDir + LINE_COUNT <= fileLines.length) {
+                cameraRow += scrollDir;
+            }
+        }
     }
 
     public void keyTyped(char typedChar, int keyCode) throws IOException {
@@ -102,10 +140,10 @@ public class GuiEditor extends GuiScreen {
         cursorColumn = Math.max(0, cursorColumn);
         cursorRow = Math.min(Math.max(cursorRow, 0), fileLines.length - 1);
 
-        if (cursorRow >= currRow + LINE_COUNT) {
-            currRow++;
-        } else if (cursorRow < currRow) {
-            currRow--;
+        if (cursorRow >= cameraRow + LINE_COUNT) {
+            cameraRow++;
+        } else if (cursorRow < cameraRow) {
+            cameraRow--;
         }
 
         if (cursorColumn > getCurrentLine().length()) {
@@ -116,11 +154,11 @@ public class GuiEditor extends GuiScreen {
     }
 
     private String getCurrentLine() {
-        return getLine(-currRow + cursorRow);
+        return getLine(-cameraRow + cursorRow);
     }
 
     private String getLine(int offset) {
-        int index = currRow + offset;
+        int index = cameraRow + offset;
         return fileLines[Math.min(Math.max(0, index), fileLines.length - 1)];
     }
 
@@ -129,6 +167,13 @@ public class GuiEditor extends GuiScreen {
             // If the cursor is not visible, update cameraColumn
             cameraColumn = Math.max(0, cursorColumn - (LINE_CHAR_COUNT - 3));
         }
+    }
+
+    private void drawScrollBar() {
+        int yOffset = getEditorHeight() * cameraRow / fileLines.length;
+        int height = getEditorHeight() * (cameraRow + LINE_COUNT) / fileLines.length - yOffset;
+        int y = topLeftY + yOffset;
+        drawRect(topLeftX + getEditorWidth() + 3, y + 9, topLeftX + getEditorWidth() + 7, y + height + 7, 0x7DFFFFFF);
     }
 
     /**
@@ -142,15 +187,15 @@ public class GuiEditor extends GuiScreen {
     private void drawTextLine(int lineNumber, String str, int x, int y, int lineNumberWidth, int maxCharLineNumber, boolean highlight) {
         // Draw line number
         int len = String.valueOf(lineNumber).length();
-        monoRenderer.drawString(String.valueOf(lineNumber), x + 9 + (maxCharLineNumber - len) * 8, y, highlight ? HIGHLIGHTED_LINE_NUMBER_COLOR : FOREGROUND_COLOR);
-        monoRenderer.drawString(str, x + lineNumberWidth + 14, y, EDITOR_FONT_COLOR);
+        monoRenderer.drawString(String.valueOf(lineNumber), x + 5 + (maxCharLineNumber - len) * 8, y, highlight ? HIGHLIGHTED_LINE_NUMBER_COLOR : FOREGROUND_COLOR);
+        monoRenderer.drawString(str, x + lineNumberWidth + 10, y, EDITOR_FONT_COLOR);
     }
 
     /**
      * @return The maximum width of visible line numbers
      */
     private int maxLineNumberWidth() {
-        return monoRenderer.getStringWidth(String.valueOf(currRow + LINE_COUNT));
+        return monoRenderer.getStringWidth(String.valueOf(cameraRow + LINE_COUNT));
     }
 
     public void onResize(Minecraft mcIn, int width, int height) {
@@ -163,84 +208,103 @@ public class GuiEditor extends GuiScreen {
         // TODO: Comment color highlighting
         // TODO: Rename from navigator to Tasky
         // TODO: Release
-        // TODO: Click to move cursor
         // TODO: Resizing container cursor bug?
-
+        // TODO: Click vertical scrollbar/horizontal to drag and scroll
+        // TODO: Text selection
         super.onResize(mcIn, width, height);
         width *= 2;
         height *= 2;
-        scaleX = width / 854.0;
-        scaleY = height / 480.0;
+        scaleX = width / 427.0;
+        scaleY = height / 400.0;
         resizeEditor(width, height);
+        calcEditorPos();
+    }
+
+    private void calcEditorPos() {
+        topLeftX = (int) ((width - 192 * scaleX) / 2);
+        topLeftY = (int) ((height - 166 * scaleY) / 2);
     }
 
     private void resizeEditor(int screenWidth, int screenHeight) {
-        LINE_COUNT = (int) (screenHeight * 10.0 / 480.0);
-        LINE_CHAR_COUNT = (int) (screenWidth * 18.0 / 854.0);
+        LINE_COUNT = (int) (screenHeight * 10.0 / 400.0);
+        LINE_CHAR_COUNT = (int) (screenWidth * 18.0 / 427.0);
     }
 
     private void drawHighlight(int x, int y, int color, int width) {
         drawRect(x, y, x + width, y + lineHeight, color);
     }
 
-    private void drawBackground(int x, int y, double scaleX, double scaleY) {
+    private void drawContainer(int x, int y) {
         textureManager.bindTexture(EDITOR);
-        int dx = maxLineNumberWidth() + 14 + LINE_CHAR_COUNT * 8;
-        int dy = (8 + 4 + 4) * LINE_COUNT; // Each line has 4px of padding + 8px for the glyph
-        drawScaledCustomSizeModalRect(x, y, 0, 0, 8, 8, 8, 8,256, 256); // top left corner
-        drawScaledCustomSizeModalRect(x + 8 + dx, y, 184, 0, 8, 8, 8, 8, 256, 256); // top right corner
-        drawScaledCustomSizeModalRect(x, y + 8 + dy, 0, 168, 8, 8, 8, 8, 256, 256); // bottom left corner
-        drawScaledCustomSizeModalRect(x + 8 + dx, y + 8 + dy, 184, 168, 8, 8, 8, 8, 256, 256); // bottom right corner
-        drawScaledCustomSizeModalRect(x + 8, y, 8, 0, 1, 8, dx, 8, 256, 256); // top
-        drawScaledCustomSizeModalRect(x, y + 8, 0, 8, 8, 1, 8, dy, 256, 256); // left
-        drawScaledCustomSizeModalRect(x + 8 + dx, y + 8, 184, 8, 8, 1, 8, dy, 256, 256); // right
-        drawScaledCustomSizeModalRect(x + 8, y + 8 + dy, 8, 168, 1, 8, dx, 8, 256, 256); // bottom
+        int editorWidth = getEditorWidth();
+        int editorHeight = getEditorHeight();
+        drawScaledCustomSizeModalRect(x, y, 0, 0, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE,256, 256); // top left corner
+        drawScaledCustomSizeModalRect(x + BORDER_SIZE + editorWidth, y, 184, 0, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // top right corner
+        drawScaledCustomSizeModalRect(x, y + BORDER_SIZE + editorHeight, 0, 168, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // bottom left corner
+        drawScaledCustomSizeModalRect(x + BORDER_SIZE + editorWidth, y + BORDER_SIZE + editorHeight, 184, 168, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, BORDER_SIZE, 256, 256); // bottom right corner
+        drawScaledCustomSizeModalRect(x + BORDER_SIZE, y, BORDER_SIZE, 0, 1, BORDER_SIZE, editorWidth, BORDER_SIZE, 256, 256); // top
+        drawScaledCustomSizeModalRect(x, y + BORDER_SIZE, 0, BORDER_SIZE, 8, 1, BORDER_SIZE, editorHeight, 256, 256); // left
+        drawScaledCustomSizeModalRect(x + BORDER_SIZE + editorWidth, y + BORDER_SIZE, 184, BORDER_SIZE, BORDER_SIZE, 1, BORDER_SIZE, editorHeight, 256, 256); // right
+        drawScaledCustomSizeModalRect(x + BORDER_SIZE, y + BORDER_SIZE + editorHeight, BORDER_SIZE, 168, 1, BORDER_SIZE, editorWidth, BORDER_SIZE, 256, 256); // bottom
 
-        drawRect(x + 8, y + 8, x + 8 + dx, y + 8 + dy, EDITOR_COLOR);
+        drawRect(x + BORDER_SIZE, y + BORDER_SIZE, x + BORDER_SIZE + editorWidth, y + BORDER_SIZE + editorHeight, EDITOR_COLOR);
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
+    private int getEditorHeight() {
+        return lineHeight * LINE_COUNT;
+    }
 
-        int topLeftX = (int) ((width - 192 * scaleX) / 2);
-        int topLeftY = (int) ((height - 166 * scaleY) / 2);
+    private int getEditorWidth() {
+        return maxLineNumberWidth() + BORDER_SIZE + 6 + LINE_CHAR_COUNT * 8;
+    }
 
-        drawBackground(topLeftX, topLeftY, scaleX, scaleY);
-
+    private void drawEditor() {
         String currLine = getCurrentLine();
-
-        for (int line = 0; line < LINE_COUNT && line + currRow < fileLines.length; line++) {
+        for (int line = 0; line < LINE_COUNT && line + cameraRow < fileLines.length; line++) {
             // Highlight the current row, line + currLine is the line in global space, line is non-normalized
-            boolean highlight = line + currRow == cursorRow;
+            boolean highlight = line + cameraRow == cursorRow;
 
             if (highlight) {
-                drawHighlight(topLeftX + 8, topLeftY + 8 + line * lineHeight, HIGHLIGHT_COLOR, maxLineNumberWidth() + 14 + LINE_CHAR_COUNT * 8);
+                drawHighlight(topLeftX + BORDER_SIZE, topLeftY + BORDER_SIZE + line * lineHeight, HIGHLIGHT_COLOR, getEditorWidth());
             }
 
             // Draw a text line
             int lineNumberWidth = maxLineNumberWidth();
             String codeLine = getLine(line);
 
-            // Draw lines w.r.t camera and cursor position (we determine cameraColumn from cursorColumn)
-            // currColumn can be found out from cursorColumn, since currColumn is what we use
-            // currColumn = last index of line if cursorColumn exceeds line length
-            // keep 3 chars on the right
-
             codeLine = cameraColumn < codeLine.length() ? codeLine.substring(cameraColumn, Math.min(codeLine.length(), cameraColumn + LINE_CHAR_COUNT)) : "";
             drawTextLine(
-                    line + 1 + currRow,
+                    line + 1 + cameraRow,
                     codeLine,
-                    topLeftX + 4,
-                    topLeftY + line * lineHeight + 12,
+                    topLeftX + BORDER_SIZE,
+                    topLeftY + line * lineHeight + BORDER_SIZE + 4,
                     lineNumberWidth,
-                    String.valueOf(currRow + LINE_COUNT).length(), highlight);
+                    String.valueOf(cameraRow + LINE_COUNT).length(),
+                    highlight);
 
-            if (line + currRow == cursorRow) {
+            if (line + cameraRow == cursorRow) {
                 // Draw the cursor
                 // offset from cursorColumn has to be calculated based on line width up to cursor column
                 int lineOffset = (Math.min(currLine.length(), cursorColumn) - cameraColumn) * 8;
-                drawRect(topLeftX + lineOffset + lineNumberWidth + 18, topLeftY + line * lineHeight + 8 + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + 8 - 2, 0xAFFFFFFF);
+                drawRect(topLeftX + lineOffset + lineNumberWidth + BORDER_SIZE + 10, topLeftY + line * lineHeight + BORDER_SIZE + 2, topLeftX + lineOffset + 19 + lineNumberWidth, topLeftY + (line + 1) * lineHeight + BORDER_SIZE - 2, 0xAFFFFFFF);
             }
         }
+    }
+
+    private void handleMouseOverText(int mouseX, int mouseY) {
+        if (mouseX >= topLeftX + BORDER_SIZE && mouseX <= topLeftX + BORDER_SIZE + getEditorWidth()
+        && mouseY >= topLeftY + BORDER_SIZE && mouseY <= topLeftY + BORDER_SIZE + getEditorHeight()) {
+            System.out.println("Moused over text");
+        }
+    }
+
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+
+        calcEditorPos();
+        drawContainer(topLeftX, topLeftY);
+        drawEditor();
+        drawScrollBar();
+        handleMouseOverText(mouseX, mouseY);
     }
 }
