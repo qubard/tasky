@@ -7,6 +7,8 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     private int bgColor, sizePx;
     private boolean vertical;
 
+    private int currIndex, windowSize, maxIndex, maxSizePx;
+
     public ScrollBar(int bgColor, int sizePx, boolean vertical) {
         this.bgColor = bgColor;
         this.sizePx = sizePx;
@@ -17,7 +19,14 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
         return this.sizePx;
     }
 
-    public void draw(int x, int y, int currIndex, int windowSize, int maxIndex, int maxSizePx) {
+    public void update(int currIndex, int windowSize, int maxIndex, int maxSizePx) {
+        this.currIndex = currIndex;
+        this.windowSize = windowSize;
+        this.maxIndex = maxIndex;
+        this.maxSizePx = maxSizePx;
+    }
+
+    public void draw(int x, int y) {
         if (vertical) {
             int yOffset = maxSizePx * currIndex / maxIndex;
             int height = maxSizePx * (currIndex + windowSize) / maxIndex - yOffset;

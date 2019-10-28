@@ -82,6 +82,7 @@ public class GuiEditor extends GuiScreen {
             calcEditorPos();
             maxLenLocal = maxLengthLineLocally();
             verticalScrollBar = new ScrollBar(SCROLL_BAR_COLOR, scrollBarSize, true);
+            updateScrollBars();
         } catch (IOException err) {
             err.printStackTrace();
         }
@@ -142,6 +143,7 @@ public class GuiEditor extends GuiScreen {
                 cameraRow += scrollDir;
             }
         }
+        updateScrollBars();
         updateCache();
     }
 
@@ -179,11 +181,13 @@ public class GuiEditor extends GuiScreen {
             cameraRow--;
         }
 
+
         if (cursorColumn > getCurrentLine().length()) {
             cursorColumn = boundCursorColumn();
         }
 
         updateCameraColumn();
+        updateScrollBars();
         updateCache();
     }
 
@@ -208,10 +212,6 @@ public class GuiEditor extends GuiScreen {
         int width = getEditorWidth() * (cameraColumn + cursorColumn) / maxLenLocal - xOffset;
         int x = topLeftX + xOffset;
         drawRect(x + BORDER_SIZE + 1, topLeftY + getEditorHeight() + 3, x + width + BORDER_SIZE - 1, topLeftY + getEditorHeight() + 7, SCROLL_BAR_COLOR);
-    }
-
-    private boolean mousedOverVerticalScrollBar() {
-        return false;
     }
 
     /**
@@ -258,11 +258,19 @@ public class GuiEditor extends GuiScreen {
         scaleY = height / 400.0;
         resizeEditor(width, height);
         calcEditorPos();
+        updateScrollBars();
     }
 
     private void calcEditorPos() {
         topLeftX = (int) ((width - 192 * scaleX) / 2);
         topLeftY = (int) ((height - 166 * scaleY) / 2);
+    }
+
+    private void updateScrollBars() {
+        verticalScrollBar.update(cameraRow,
+                LINE_COUNT,
+                fileLines.length,
+                getEditorHeight() - 2);
     }
 
     private void resizeEditor(int screenWidth, int screenHeight) {
@@ -332,7 +340,7 @@ public class GuiEditor extends GuiScreen {
         }
     }
 
-    private void handleMouseOverText(int mouseX, int mouseY) throws LWJGLException {
+    private void drawTextCursor(int mouseX, int mouseY) throws LWJGLException {
         if (mouseX >= topLeftX + BORDER_SIZE && mouseX <= topLeftX + BORDER_SIZE + getEditorWidth()
                 && mouseY >= topLeftY + BORDER_SIZE && mouseY <= topLeftY + BORDER_SIZE + getEditorHeight()) {
             try {
@@ -340,7 +348,7 @@ public class GuiEditor extends GuiScreen {
                 if (Mouse.getNativeCursor() != emptyCursor)
                 Mouse.setNativeCursor(emptyCursor);
                 textureManager.bindTexture(EDITOR);
-                drawScaledCustomSizeModalRect(mouseX, mouseY, 195, 1, 5, 11, 5, 11,256, 256);
+                drawScaledCustomSizeModalRect(mouseX - 5 / 2, mouseY - 11 / 2, 195, 1, 5, 11, 5, 11,256, 256);
             } catch (LWJGLException e) {
                 //TODO: Consider better exception handling
                 e.printStackTrace();
@@ -357,19 +365,12 @@ public class GuiEditor extends GuiScreen {
         drawContainer(topLeftX, topLeftY);
         drawEditor();
 
-        drawHorizontalScrollBar();
-
         try {
-            handleMouseOverText(mouseX, mouseY);
+            drawTextCursor(mouseX, mouseY);
         } catch (LWJGLException e) {
             e.printStackTrace();
         }
 
-        verticalScrollBar.draw(topLeftX + getEditorWidth() + BORDER_SIZE - verticalScrollBar.getSize() - 1,
-                topLeftY + BORDER_SIZE + 1,
-                cameraRow,
-                LINE_COUNT,
-                fileLines.length,
-                getEditorHeight() - 2);
+        verticalScrollBar.draw(topLeftX + getEditorWidth() + BORDER_SIZE - verticalScrollBar.getSize() - 1, topLeftY + BORDER_SIZE + 1);
     }
 }
