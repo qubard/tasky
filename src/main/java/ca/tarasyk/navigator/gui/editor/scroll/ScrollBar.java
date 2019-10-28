@@ -40,7 +40,7 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     }
 
     @Override
-    public boolean onMouseReleasE(int mouseX, int mouseY) {
+    public boolean onMouseRelease(int mouseX, int mouseY) {
         return false;
     }
 }
