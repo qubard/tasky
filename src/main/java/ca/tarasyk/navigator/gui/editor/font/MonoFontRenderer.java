@@ -1,4 +1,4 @@
-package ca.tarasyk.navigator.gui.editor;
+package ca.tarasyk.navigator.gui.editor.font;
 
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
