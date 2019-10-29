@@ -29,7 +29,7 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     }
 
     public void shift(boolean pos) {
-        updateShift((pos ? 1.0f : -1.0f ) * 1.0f / (maxIndex - 1.0f));
+        updateShift((pos ? 1.0f : -1.0f ) * 1.0f / maxIndex);
         applyTempShift();
     }
 
@@ -46,13 +46,19 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     }
 
     public float calcDirSizeRatio() {
-        return (float) windowSize / (float) maxIndex;
+        return Math.min((float) windowSize / (float) maxIndex, 1.0f);
     }
 
     public void draw() {
         if (vertical) {
-            drawRect(anchorX, anchorY + calcTotalShift(), anchorX + sizePx, anchorY + calcDirSize() + calcTotalShift(), bgColor);
+            drawRect(anchorX, anchorY + calcTotalShift(), anchorX + sizePx, anchorY + calcTotalDirSize(), bgColor);
         }
+    }
+
+    // There will be minor errors from not adding the floats first before converting to pixels space
+    // To rectify this add dirSizeRatio then the shifts
+    public int calcTotalDirSize() {
+        return (int) (maxSizePx * (calcDirSizeRatio() + tempShift + shift));
     }
 
     public int calcTotalShift() {
@@ -89,9 +95,9 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     @Override
     public boolean isMousedOver(int mouseX, int mouseY) {
         if (vertical) {
-            return mouseX >= anchorX && mouseX <= anchorX + sizePx && mouseY >= anchorY + calcTotalShift() && mouseY <= anchorY + calcDirSize() + calcTotalShift();
+            return mouseX >= anchorX && mouseX <= anchorX + sizePx && mouseY >= anchorY + calcTotalShift() && mouseY <= anchorY + calcTotalDirSize();
         }
-        return mouseX >= anchorX + calcTotalShift() && mouseX <= anchorX + calcDirSize() + calcTotalShift() && mouseY >= anchorY && mouseY <= anchorY + sizePx;
+        return mouseX >= anchorX + calcTotalShift() && mouseX <= anchorX + calcTotalDirSize() && mouseY >= anchorY && mouseY <= anchorY + sizePx;
     }
 
     @Override

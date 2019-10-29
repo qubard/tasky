@@ -389,7 +389,11 @@ public class GuiEditor extends GuiScreen {
         // Update cameraRow from the scroll bar if we're dragging it
         if (verticalScrollBar.isDragged()) {
             verticalScrollBar.onMouseDrag(mouseX, mouseY);
-            cameraRow = (fileLines.length - LINE_COUNT + 1) * (verticalScrollBar.calcTotalShift()) / (verticalScrollBar.getMaxSize() - verticalScrollBar.calcDirSize());
+            if (verticalScrollBar.getMaxSize() - verticalScrollBar.calcDirSize() == 0) {
+                cameraRow = 0;
+            } else {
+                cameraRow = Math.min(Math.max(0, (fileLines.length - LINE_COUNT + 1) * (verticalScrollBar.calcTotalShift()) / (verticalScrollBar.getMaxSize() - verticalScrollBar.calcDirSize())), fileLines.length - 1);
+            }
         }
 
         verticalScrollBar.draw();
