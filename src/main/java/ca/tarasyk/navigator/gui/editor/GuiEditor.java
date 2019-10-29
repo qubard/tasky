@@ -148,6 +148,7 @@ public class GuiEditor extends GuiScreen {
         if (scrollDir != 0) {
             if (cameraRow + scrollDir >= 0 && cameraRow + scrollDir + LINE_COUNT <= fileLines.length) {
                 cameraRow += scrollDir;
+                verticalScrollBar.shift(scrollDir > 0);
             }
         }
         updateCache();
@@ -183,10 +184,11 @@ public class GuiEditor extends GuiScreen {
 
         if (cursorRow >= cameraRow + LINE_COUNT) {
             cameraRow++;
+            verticalScrollBar.shift(true);
         } else if (cursorRow < cameraRow) {
             cameraRow--;
+            verticalScrollBar.shift(false);
         }
-
 
         if (cursorColumn > getCurrentLine().length()) {
             cursorColumn = boundCursorColumn();
@@ -275,7 +277,6 @@ public class GuiEditor extends GuiScreen {
     private void updateScrollBars() {
         verticalScrollBar.update(topLeftX + getEditorWidth() + BORDER_SIZE - verticalScrollBar.getSize() - 1,
                 topLeftY + BORDER_SIZE + 1,
-                cameraRow,
                 LINE_COUNT,
                 fileLines.length,
                 getEditorHeight() - 2);
@@ -362,7 +363,8 @@ public class GuiEditor extends GuiScreen {
                 e.printStackTrace();
             }
         } else {
-            if (Mouse.getNativeCursor() != originalCursor) Mouse.setNativeCursor(originalCursor);
+            if (Mouse.getNativeCursor() != originalCursor)
+                Mouse.setNativeCursor(originalCursor);
         }
     }
 
@@ -379,9 +381,10 @@ public class GuiEditor extends GuiScreen {
             e.printStackTrace();
         }
 
+        // Update cameraRow from the scroll bar if we're dragging it
         if (verticalScrollBar.isDragged()) {
             verticalScrollBar.onMouseDrag(mouseX, mouseY);
-            cameraRow = (fileLines.length - LINE_COUNT) * (verticalScrollBar.calcTotalShift()) / (verticalScrollBar.getMaxSize() - verticalScrollBar.calcDirSize());
+            cameraRow = (fileLines.length - LINE_COUNT + 1) * (verticalScrollBar.calcTotalShift()) / (verticalScrollBar.getMaxSize() - verticalScrollBar.calcDirSize());
         }
 
         verticalScrollBar.draw();

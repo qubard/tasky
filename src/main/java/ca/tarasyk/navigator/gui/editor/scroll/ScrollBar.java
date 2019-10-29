@@ -9,7 +9,9 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
 
     private int anchorX, anchorY, windowSize, maxIndex, maxSizePx;
 
-    private int startDragX, startDragY, tempShift, shift;
+    private int startDragX, startDragY;
+
+    private float tempShift, shift;
     private boolean isDragged;
 
     public ScrollBar(int bgColor, int sizePx, boolean vertical) {
@@ -18,12 +20,17 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
         this.vertical = vertical;
     }
 
-    public void update(int anchorX, int anchorY, int currIndex, int windowSize, int maxIndex, int maxSizePx) {
+    public void update(int anchorX, int anchorY, int windowSize, int maxIndex, int maxSizePx) {
         this.anchorX = anchorX;
         this.anchorY = anchorY;
         this.windowSize = windowSize;
         this.maxIndex = maxIndex;
         this.maxSizePx = maxSizePx;
+    }
+
+    public void shift(boolean pos) {
+        updateShift((pos ? 1.0f : -1.0f ) * 1.0f / (maxIndex - 1.0f));
+        applyTempShift();
     }
 
     public int getSize() {
@@ -35,7 +42,11 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     }
 
     public int calcDirSize() {
-        return maxSizePx * windowSize / maxIndex;
+        return (int) (maxSizePx * calcDirSizeRatio());
+    }
+
+    public float calcDirSizeRatio() {
+        return (float) windowSize / (float) maxIndex;
     }
 
     public void draw() {
@@ -45,7 +56,32 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
     }
 
     public int calcTotalShift() {
-        return tempShift + shift;
+        return (int) (maxSizePx * (tempShift + shift));
+    }
+
+    public void updateShift(float deltaShift) {
+        if (shift + deltaShift < 0) {
+            tempShift = -shift;
+        } else if (shift + deltaShift + calcDirSizeRatio() > 1.0f) {
+            tempShift = 1.0f - shift - calcDirSizeRatio();
+        } else {
+            tempShift = deltaShift;
+        }
+    }
+
+    public void applyTempShift() {
+        if (shift + tempShift < 0) {
+            shift = 0.0f;
+        } else if (shift + tempShift + calcDirSizeRatio() > 1.0f) {
+            shift = 1.0f;
+        } else {
+            shift += tempShift;
+        }
+        tempShift = 0.0f;
+    }
+
+    public void setShiftFromIndex(int index) {
+        shift = (float) index / (float) maxIndex;
     }
 
     @Override
@@ -53,20 +89,13 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
         if (vertical) {
             return mouseX >= anchorX && mouseX <= anchorX + sizePx && mouseY >= anchorY + calcTotalShift() && mouseY <= anchorY + calcDirSize() + calcTotalShift();
         }
-
         return mouseX >= anchorX + calcTotalShift() && mouseX <= anchorX + calcDirSize() + calcTotalShift() && mouseY >= anchorY && mouseY <= anchorY + sizePx;
     }
 
     @Override
     public void onMouseDrag(int mouseX, int mouseY) {
-        int possibleShift = mouseY - (vertical ? startDragY : startDragX);
-        if (shift + possibleShift < 0) {
-            tempShift = -shift;
-        } else if (shift + possibleShift + calcDirSize() > maxSizePx) {
-            tempShift = maxSizePx - shift - calcDirSize();
-        } else {
-            tempShift = possibleShift;
-        }
+        float shiftRatio = (float)(mouseY - (vertical ? startDragY : startDragX)) / (float)maxSizePx;
+        updateShift(shiftRatio);
     }
 
     @Override
@@ -84,14 +113,7 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
             isDragged = false;
 
             // When updating shift it may go out of bounds, so clamp it
-            if (shift + tempShift < 0) {
-                shift = 0;
-            } else if (shift + tempShift + calcDirSize() > maxSizePx) {
-                shift = maxSizePx;
-            } else {
-                shift += tempShift;
-            }
-            tempShift = 0;
+            applyTempShift();
         }
     }
 
