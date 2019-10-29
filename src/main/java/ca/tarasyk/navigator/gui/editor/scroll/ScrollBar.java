@@ -64,6 +64,8 @@ public class ScrollBar extends GuiScreen implements MouseInteract {
             tempShift = -shift;
         } else if (shift + deltaShift + calcDirSizeRatio() > 1.0f) {
             tempShift = 1.0f - shift - calcDirSizeRatio();
+            // shift + x + calcDirSizeRatio() = 1
+            // 1 - shift - calc
         } else {
             tempShift = deltaShift;
         }

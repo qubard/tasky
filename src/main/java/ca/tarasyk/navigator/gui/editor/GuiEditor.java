@@ -13,6 +13,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
@@ -259,6 +260,7 @@ public class GuiEditor extends GuiScreen {
         // TODO: Text selection
         // TODO: Cursor changing bug
         // TODO: Component/Widget interface for sub-components of gui? Update can be called on all of them
+        // TODO: 7px font, better spacing
         super.onResize(mcIn, width, height);
         width *= 2;
         height *= 2;
@@ -266,6 +268,9 @@ public class GuiEditor extends GuiScreen {
         scaleY = height / 400.0;
         resizeEditor(width, height);
         calcEditorPos();
+
+        cameraRow = 0;
+        verticalScrollBar.setShiftFromIndex(0);
     }
 
     private void calcEditorPos() {
