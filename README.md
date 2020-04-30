@@ -7,7 +7,7 @@ Tasky is actually fully functional except for the text editor. I sort of got bor
 
 # Features
 
-- Inventory script hooks
+- 35 functional hooks (and more coming as Tasky grows)
 - A* pathfinding with `moveTo`
 - In-game text editor for scripts (wip)
 
